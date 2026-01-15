@@ -196,14 +196,6 @@
             font-weight: 600;
         }
 
-        .positive-pnl {
-            color: #4cd964;
-        }
-
-        .negative-pnl {
-            color: #ff3b30;
-        }
-
         .auto-update-status {
             display: inline-flex;
             align-items: center;
@@ -256,21 +248,6 @@
             text-align: center;
         }
 
-        .error-message h3 {
-            margin-bottom: 10px;
-        }
-
-        .error-message button {
-            background: rgba(76, 217, 100, 0.2);
-            border: 1px solid rgba(76, 217, 100, 0.3);
-            color: #4cd964;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
         .timestamp-display {
             color: #aaa;
             font-size: 0.85rem;
@@ -307,14 +284,14 @@
 
         .modal-content {
             background: #2a2a2a;
-            max-width: 1000px; /* ← 调整这个值控制最大宽度 */
-            width: 90%; /* ← 调整这个值控制宽度百分比 */
+            max-width: 1000px;
+            width: 90%;
             margin: 50px auto;
             padding: 30px;
             border-radius: 12px;
             color: #fff;
             position: relative;
-            max-height: 800px; /* ← 调整这个值控制最大高度 */
+            max-height: 800px;
             display: flex;
             flex-direction: column;
         }
@@ -326,7 +303,7 @@
             background: none;
             border: none;
             color: #aaa;
-            font-size: 24px; /* 加大关闭按钮 */
+            font-size: 24px;
             cursor: pointer;
             width: 32px;
             height: 32px;
@@ -344,7 +321,7 @@
         .modal-title {
             color: #ff3b30;
             margin-bottom: 20px;
-            font-size: 1.8rem; /* 加大标题 */
+            font-size: 1.8rem;
         }
 
         .modal-body {
@@ -356,7 +333,7 @@
 
         .modal-body p {
             margin-bottom: 15px;
-            font-size: 1.1rem; /* 加大字体 */
+            font-size: 1.1rem;
         }
 
         .modal-body strong {
@@ -365,61 +342,29 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-            100% {
-                opacity: 1;
-            }
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         @media (max-width: 768px) {
-            .chart-container {
-                flex-direction: column;
-            }
-            .stats-bar {
-                flex-wrap: wrap;
-            }
-            .stat-item {
-                flex: 0 0 33.33%;
-                margin-bottom: 15px;
-            }
-            h1 {
-                font-size: 2.2rem;
-            }
-            .chart {
-                height: 400px;
-            }
-            .auto-update-status {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .modal-content {
-                width: 95%;
-                max-height: 80vh;
-                padding: 20px;
-            }
-            .modal-title {
-                font-size: 1.5rem;
-            }
-            .modal-body p {
-                font-size: 1rem;
-            }
+            .chart-container { flex-direction: column; }
+            .stats-bar { flex-wrap: wrap; }
+            .stat-item { flex: 0 0 33.33%; margin-bottom: 15px; }
+            h1 { font-size: 2.2rem; }
+            .chart { height: 400px; }
+            .auto-update-status { flex-direction: column; align-items: center; text-align: center; }
+            .modal-content { width: 95%; max-height: 80vh; padding: 20px; }
+            .modal-title { font-size: 1.5rem; }
+            .modal-body p { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
-    <!-- 页面顶部警告条 -->
     <div id="globalWarning">
         <i class="fas fa-exclamation-circle"></i>
         <strong>模拟交易回测系统 - 不构成投资建议</strong>
@@ -433,7 +378,6 @@
 
     <div class="container" id="mainContainer" style="display: none;">
         <header>
-            <!-- 移除了标题前面的图标 -->
             <h1>特斯拉(TSLA)模拟交易策略跟踪</h1>
             <div class="auto-update-status">
                 <span class="status-indicator"></span>
@@ -510,36 +454,31 @@
         </div>
     </div>
 
-    <!-- 免责声明模态框（优化版） -->
     <div id="disclaimerModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeDisclaimerModal()">✕</button>
-
-            <h3 class="modal-title">
-                <i class="fas fa-exclamation-triangle"></i> 免责声明
-            </h3>
-
+            <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> 免责声明</h3>
             <div class="modal-body">
                 <p><strong>1. 性质说明</strong> 本平台为特斯拉(TSLA)股票的模拟交易策略回测工具，所有交易均为虚拟模拟，不涉及真实资金。</p>
-
                 <p><strong>2. 非投资建议</strong> 所有展示的策略、数据和图表仅为历史回测结果，不构成任何形式的投资建议、推荐或承诺。</p>
-
                 <p><strong>3. 风险警示</strong> 实际股票市场投资具有高风险，可能导致本金全部损失。过去表现不代表未来收益。</p>
-
                 <p><strong>4. 数据免责</strong> 平台数据来源于公开市场信息，不保证准确性、完整性或及时性。数据仅供参考。</p>
-
                 <p><strong>5. 责任限制</strong> 平台所有者、开发者及相关方不对因使用本平台数据导致的任何投资损失承担责任。</p>
-
                 <p><strong>6. 用户责任</strong> 用户应独立判断，自负投资风险。建议咨询持牌投资顾问。</p>
             </div>
         </div>
     </div>
 
     <script>
-        // 全局变量
         let chartInstance = null;
         let currentData = null;
-        let dataVersion = "1.0.0";  // 默认版本号，用于控制台输出
+        let dataVersion = "1.0.0";
+        let isSliding = false; // 防止重复滚动的标志
+        let slideCooldown = false; // 冷却标志
+        let lastWheelTime = 0; // 上次滚轮事件时间
+        let wheelSpeedFactor = 0; // 滚轮速度因子
+        let cumulativeDelta = 0; // 累积的滚动量
+        let lastUpdateTime = 0; // 上次更新时间
 
         // 免责声明相关
         function showDisclaimerModal() {
@@ -548,11 +487,9 @@
 
         function closeDisclaimerModal() {
             document.getElementById('disclaimerModal').style.display = 'none';
-            // 设置cookie，24小时内不再显示
             document.cookie = "disclaimer_closed=true; max-age=86400; path=/";
         }
 
-        // 检查是否已关闭过免责声明
         function checkDisclaimer() {
             if (!document.cookie.includes('disclaimer_closed=true')) {
                 setTimeout(() => {
@@ -561,9 +498,8 @@
             }
         }
 
-        // 获取数据文件 URL - 添加时间戳避免缓存
+        // 获取数据文件URL
         const getDataFileUrl = () => {
-            // 每次请求都带上当前时间戳，确保获取最新数据
             return `./data.json?t=${Date.now()}`;
         };
 
@@ -595,8 +531,7 @@
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                const data = await response.json();
-                return data;
+                return await response.json();
             } catch (error) {
                 console.error('加载数据失败:', error);
                 throw error;
@@ -609,13 +544,11 @@
                 return [];
             }
 
-            // 按时间排序（从早到晚）
             const sortedTrades = [...trades].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
 
-            // 转换为K线格式：[时间, 开盘价, 最高价, 最低价, 收盘价]
-            const klineData = sortedTrades.map(trade => {
+            return sortedTrades.map(trade => {
                 const dateStr = trade.date;
                 let formattedDate = dateStr;
 
@@ -634,29 +567,25 @@
 
                 return [
                     formattedDate,
-                    Number(trade.open) || 0,  // 开盘价
-                    Number(trade.high) || 0,  // 最高价
-                    Number(trade.low) || 0,   // 最低价
-                    Number(trade.close) || 0  // 收盘价
+                    Number(trade.open) || 0,
+                    Number(trade.high) || 0,
+                    Number(trade.low) || 0,
+                    Number(trade.close) || 0
                 ];
             });
-
-            return klineData;
         }
 
-        // 从trades数据生成净值(equity)数据 - 用于图表
+        // 从trades数据生成净值数据
         function generateEquityData(trades) {
             if (!trades || trades.length === 0) {
                 return [];
             }
 
-            // 按时间排序（从早到晚）
             const sortedTrades = [...trades].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
 
-            // 转换为净值格式：[时间, 净值] - 使用所有交易记录
-            const equityData = sortedTrades.map(trade => {
+            return sortedTrades.map(trade => {
                 const dateStr = trade.date;
                 let formattedDate = dateStr;
 
@@ -678,22 +607,18 @@
                     Number(trade.equity) || 0
                 ];
             });
-
-            return equityData;
         }
 
-        // 从trades数据生成每日结束时的净值数据（用于计算最大回撤）
+        // 从trades数据生成每日结束时的净值数据
         function generateDailyEquityData(trades) {
             if (!trades || trades.length === 0) {
                 return [];
             }
 
-            // 按时间排序（从早到晚）
             const sortedTrades = [...trades].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
 
-            // 按日期分组，取每日最后一条记录的净值
             const dailyEquityMap = new Map();
 
             sortedTrades.forEach(trade => {
@@ -701,7 +626,6 @@
                 let dateKey = '';
 
                 if (dateStr) {
-                    // 格式1: "20260102 10:00:00" (15个字符)
                     if (dateStr.length === 15) {
                         try {
                             const datePart = dateStr.substring(0, 8);
@@ -712,9 +636,7 @@
                         } catch (e) {
                             console.error('日期格式化错误:', e);
                         }
-                    }
-                    // 格式2: "2026-01-02 10:00:00" (19个字符)
-                    else if (dateStr.length >= 10) {
+                    } else if (dateStr.length >= 10) {
                         try {
                             dateKey = dateStr.substring(0, 10);
                         } catch (e) {
@@ -731,12 +653,9 @@
                 }
             });
 
-            // 转换为净值格式：[日期, 净值]
-            const equityData = Array.from(dailyEquityMap.values())
+            return Array.from(dailyEquityMap.values())
                 .sort((a, b) => a.date.localeCompare(b.date))
                 .map(item => [item.date, item.equity]);
-
-            return equityData;
         }
 
         // 从净值数据生成收益百分比数据
@@ -745,27 +664,22 @@
                 return [];
             }
 
-            // 计算初始净值（第一个净值）
             const initialEquity = equityData[0][1];
             if (initialEquity <= 0) {
                 return [];
             }
 
-            // 转换为收益格式：[时间, 收益百分比]
-            const returnsData = equityData.map(item => {
+            return equityData.map(item => {
                 const currentEquity = item[1];
                 const returnPercent = ((currentEquity - initialEquity) / initialEquity * 100);
-
                 return [
                     item[0],
                     parseFloat(returnPercent.toFixed(2))
                 ];
             });
-
-            return returnsData;
         }
 
-        // 计算最大回撤（基于每日结束时的净值数据）
+        // 计算最大回撤
         function calculateMaxDrawdownFromEquity(dailyEquityData) {
             if (!dailyEquityData || dailyEquityData.length < 2) {
                 return { maxDrawdownPercent: 0, maxDrawdownDays: 0 };
@@ -786,7 +700,6 @@
                     peakDate = currentDate;
                 } else {
                     const drawdown = (peak - currentEquity) / peak * 100;
-
                     if (drawdown > maxDrawdown) {
                         maxDrawdown = drawdown;
                         drawdownStartDate = peakDate;
@@ -795,14 +708,12 @@
                 }
             }
 
-            // 计算最大回撤天数
             let maxDrawdownDays = 0;
             try {
                 const startDate = new Date(drawdownStartDate);
                 const endDate = new Date(drawdownEndDate);
                 const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
                 maxDrawdownDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
                 if (isNaN(maxDrawdownDays) || maxDrawdownDays < 0) {
                     maxDrawdownDays = 0;
                 }
@@ -820,7 +731,6 @@
         // 格式化日期显示
         function formatDate(dateStr) {
             if (!dateStr) return '';
-
             try {
                 if (dateStr.length === 15) {
                     const datePart = dateStr.substring(0, 8);
@@ -829,16 +739,87 @@
                     const month = datePart.substring(4, 6);
                     const day = datePart.substring(6, 8);
                     return `${year}-${month}-${day} ${timePart}`;
+                } else if (dateStr.length === 19) {
+                    return dateStr;
+                } else if (dateStr.includes('-')) {
+                    return dateStr;
+                } else {
+                    console.warn('未知日期格式:', dateStr);
+                    return dateStr;
                 }
-                return dateStr;
             } catch (e) {
-                console.error('日期格式化错误:', e);
+                console.error('日期格式化错误:', e, '原始字符串:', dateStr);
                 return dateStr;
             }
         }
 
+        // 生成买卖标记数据
+        function generateTradeMarkers(tradeRecords) {
+            if (!tradeRecords || tradeRecords.length === 0) {
+                return { buyMarkers: [], sellMarkers: [] };
+            }
+
+            const sortedTrades = [...tradeRecords].sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            });
+
+            const buyMarkers = [];
+            const sellMarkers = [];
+
+            sortedTrades.forEach(trade => {
+                const dateStr = trade.date;
+                let formattedDate = dateStr;
+
+                if (dateStr && dateStr.length === 15) {
+                    try {
+                        const datePart = dateStr.substring(0, 8);
+                        const timePart = dateStr.substring(9);
+                        const year = datePart.substring(0, 4);
+                        const month = datePart.substring(4, 6);
+                        const day = datePart.substring(6, 8);
+                        formattedDate = `${year}-${month}-${day} ${timePart}`;
+                    } catch (e) {
+                        console.error('日期格式化错误:', e);
+                    }
+                }
+
+                const closePrice = Number(trade.close) || 0;
+                const lowPrice = Number(trade.low) || closePrice;
+                const highPrice = Number(trade.high) || closePrice;
+
+                if (trade.operation === 'BUY') {
+                    const buyPosition = lowPrice - (lowPrice * 0.002);
+                    buyMarkers.push({
+                        value: [
+                            formattedDate,
+                            buyPosition,
+                            'BUY',
+                            'BUY',
+                            closePrice.toFixed(2)
+                        ]
+                    });
+                } else if (trade.operation === 'SELL') {
+                    const sellPosition = highPrice + (highPrice * 0.002);
+                    sellMarkers.push({
+                        value: [
+                            formattedDate,
+                            sellPosition,
+                            'SELL',
+                            'SELL',
+                            closePrice.toFixed(2)
+                        ]
+                    });
+                }
+            });
+
+            console.log('买入标记数量:', buyMarkers.length);
+            console.log('卖出标记数量:', sellMarkers.length);
+
+            return { buyMarkers, sellMarkers };
+        }
+
         // 初始化合并图表
-        function initCombinedChart(klineData, returnsData) {
+        function initCombinedChart(klineData, returnsData, tradeRecords) {
             const chartDom = document.getElementById('combinedChart');
             if (!chartDom) {
                 return null;
@@ -855,73 +836,120 @@
                 return null;
             }
 
-            // 准备K线数据 - 按照ECharts candlestick要求的顺序：[开盘价, 收盘价, 最低价, 最高价]
             const klineSeriesData = klineData.map(item => [
-                item[1] || 0, // 开盘价
-                item[4] || 0, // 收盘价
-                item[3] || 0, // 最低价
-                item[2] || 0  // 最高价
+                item[1] || 0,
+                item[4] || 0,
+                item[3] || 0,
+                item[2] || 0
             ]);
 
             const timeData = klineData.map(item => item[0] || '');
 
-            // 准备收益数据
             let returnsSeriesData = [];
             if (returnsData && returnsData.length > 0) {
                 returnsSeriesData = returnsData.map(item => item[1] || 0);
             }
 
+            const tradeMarkers = generateTradeMarkers(tradeRecords);
+
             const option = {
                 backgroundColor: 'transparent',
                 tooltip: {
                     trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross'
-                    },
+                    axisPointer: { type: 'cross' },
                     backgroundColor: 'rgba(0,0,0,0.8)',
-                    textStyle: {
-                        color: '#fff'
-                    },
+                    textStyle: { color: '#fff' },
                     formatter: function(params) {
                         let result = '';
+                        let operationType = '';
+                        let markerData = null;
+
                         params.forEach(param => {
                             if (param.seriesType === 'candlestick') {
                                 const dataIndex = param.dataIndex;
-                                result += `${timeData[dataIndex]}<br/>`;
-                                // 从调试截图可知，param.value包含5个值：[索引, 开盘价, 最高价, 最低价, 收盘价]
-                                // 索引是第0个元素，我们跳过它，从第1个开始是价格数据
+                                result += `<strong>${timeData[dataIndex]}</strong><br/>`;
                                 result += `开盘: ${param.value[1]}<br/>`;
                                 result += `最高: ${param.value[4]}<br/>`;
                                 result += `最低: ${param.value[3]}<br/>`;
                                 result += `收盘: ${param.value[2]}<br/>`;
                             } else if (param.seriesType === 'line') {
                                 result += `收益: ${param.value.toFixed(2)}%<br/>`;
+                            } else if (param.seriesType === 'scatter') {
+                                if (param.data && param.data.length > 2) {
+                                    markerData = param.data;
+                                }
                             }
                         });
+
+                        if (markerData) {
+                            operationType = markerData[2] || markerData[3] || '';
+                        }
+
+                        if (operationType === 'BUY' || operationType === 'SELL') {
+                            result += `操作: ${operationType}<br/>`;
+                        }
+
                         return result;
                     }
                 },
                 legend: {
-                    data: ['价格', '收益'],
-                    textStyle: {
-                        color: '#aaa'
-                    },
+                    data: ['价格', '收益', '买入', '卖出'],
+                    textStyle: { color: '#aaa' },
                     top: 10
                 },
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        xAxisIndex: 0,
+                        filterMode: 'filter',
+                        zoomOnMouseWheel: true,  // 图表区域内滚轮缩放
+                        moveOnMouseWheel: true,  // 图表区域内滚轮平移 - 禁用，用自定义
+                        moveOnMouseMove: true,    // 图表区域内鼠标拖拽平移
+                        zoomLock: true,          // 禁用缩放
+                        zoomSensitivity: 0.5,     // 缩放灵敏度，值越小越慢
+                        start: Math.max(0, 100 - Math.min(70, klineData.length) / klineData.length * 100),
+                        end: 100,
+                        minValueSpan: Math.min(20, klineData.length),
+                        maxValueSpan: Math.min(2000000, klineData.length)
+                    },
+                    {
+                        type: 'slider',
+                        xAxisIndex: 0,
+                        show: true,
+                        start: Math.max(0, 100 - Math.min(70, klineData.length) / klineData.length * 100),
+                        end: 100,
+                        bottom: 25,
+                        height: 20,
+                        backgroundColor: 'rgba(150, 150, 150, 0.2)',
+                        borderColor: 'rgba(150, 150, 150, 0.3)',
+                        fillerColor: 'rgba(150, 150, 150, 0.4)',
+                        handleStyle: {
+                            color: 'rgba(180, 180, 180, 0.8)',
+                            borderColor: 'rgba(200, 200, 200, 0.8)',
+                            borderWidth: 1
+                        },
+                        textStyle: { color: '#aaa' },
+                        dataBackground: {
+                            lineStyle: { opacity: 0 },
+                            areaStyle: { opacity: 0 }
+                        },
+                        // 禁用ECharts自带的滚轮控制
+                        moveOnMouseWheel: false,
+                        zoomOnMouseWheel: false,
+                        brushSelect: false,
+                        showDetail: false
+                    }
+                ],
                 grid: {
                     left: '3%',
                     right: '4%',
-                    bottom: '8%',
+                    bottom: '20%',
                     top: '15%'
                 },
                 xAxis: {
                     type: 'category',
                     data: timeData,
-                    axisLine: {
-                        lineStyle: {
-                            color: '#aaa'
-                        }
-                    },
+                    axisLine: { lineStyle: { color: '#aaa' } },
                     axisLabel: {
                         color: '#aaa',
                         fontSize: 10,
@@ -939,19 +967,10 @@
                     {
                         type: 'value',
                         scale: true,
-                        name: '价格',
-                        nameTextStyle: {
-                            color: '#aaa'
-                        },
-                        axisLine: {
-                            lineStyle: {
-                                color: '#aaa'
-                            }
-                        },
-                        axisLabel: {
-                            color: '#aaa',
-                            formatter: '{value}'
-                        },
+                        // name: '价格',
+                        nameTextStyle: { color: '#aaa' },
+                        axisLine: { lineStyle: { color: '#aaa' } },
+                        axisLabel: { color: '#aaa', formatter: '{value}' },
                         splitLine: {
                             lineStyle: {
                                 color: 'rgba(255, 255, 255, 0.1)',
@@ -962,22 +981,11 @@
                     {
                         type: 'value',
                         scale: true,
-                        name: '收益(%)',
-                        nameTextStyle: {
-                            color: '#aaa'
-                        },
-                        axisLine: {
-                            lineStyle: {
-                                color: '#aaa'
-                            }
-                        },
-                        axisLabel: {
-                            color: '#aaa',
-                            formatter: '{value}%'
-                        },
-                        splitLine: {
-                            show: false
-                        },
+                        // name: '收益(%)',
+                        nameTextStyle: { color: '#aaa' },
+                        axisLine: { lineStyle: { color: '#aaa' } },
+                        axisLabel: { color: '#aaa', formatter: '{value}%' },
+                        splitLine: { show: false },
                         position: 'right'
                     }
                 ],
@@ -993,7 +1001,10 @@
                             borderColor0: '#4cd964',
                             borderWidth: 1
                         },
-                        // 在这里添加宽度控制参数
+                        barWidth: 10,
+                        barMinWidth: 6,
+                        barMaxWidth: 12,
+                        barCategoryGap: '40%',
                         yAxisIndex: 0
                     },
                     {
@@ -1015,13 +1026,43 @@
                                 { offset: 1, color: 'rgba(0, 201, 255, 0.1)' }
                             ])
                         }
+                    },
+                    {
+                        name: '买入',
+                        type: 'scatter',
+                        data: tradeMarkers.buyMarkers.map(marker => marker.value),
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        symbolRotate: 0,
+                        itemStyle: {
+                            color: '#FF77A9',
+                            borderWidth: 0
+                        },
+                        yAxisIndex: 0,
+                        zlevel: 20
+                    },
+                    {
+                        name: '卖出',
+                        type: 'scatter',
+                        data: tradeMarkers.sellMarkers.map(marker => marker.value),
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        symbolRotate: 0,
+                        itemStyle: {
+                            color: '#F0FFF0',
+                            borderWidth: 1
+                        },
+                        yAxisIndex: 0,
+                        zlevel: 20
                     }
                 ]
             };
 
             chartInstance.setOption(option);
 
-            // 响应窗口大小变化
+            // 自定义滚轮控制逻辑
+            setupCustomWheelControl(chartDom);
+
             window.addEventListener('resize', function() {
                 chartInstance.resize();
             });
@@ -1029,7 +1070,104 @@
             return chartInstance;
         }
 
-        // 渲染交易记录表格 - 修正：按时间顺序过滤重复项
+        // 设置自定义滚轮控制
+        function setupCustomWheelControl(chartDom) {
+            const slider = chartDom.querySelector('.echarts-slider');
+            if (!slider) {
+                setTimeout(() => setupCustomWheelControl(chartDom), 100);
+                return;
+            }
+
+            // 禁用ECharts自带的滚轮事件
+            chartDom.removeEventListener('wheel', chartDom._wheelHandler);
+
+            // 添加自定义滚轮事件监听
+            slider.addEventListener('wheel', handleCustomWheel, { passive: false });
+
+            // 记录滚轮处理器以便后续移除
+            chartDom._customWheelHandler = handleCustomWheel;
+        }
+
+        // 自定义滚轮处理函数
+        function handleCustomWheel(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (isSliding) return;
+
+            const currentTime = Date.now();
+            const timeDiff = currentTime - lastWheelTime;
+
+            // 控制滚轮事件频率
+            if (timeDiff < 50) { // 50毫秒冷却时间，可调整
+                return;
+            }
+
+            lastWheelTime = currentTime;
+
+            // 获取当前dataZoom的start和end
+            const currentOption = chartInstance.getOption();
+            const dataZoom = currentOption.dataZoom[1];
+
+            if (!dataZoom || dataZoom.start === undefined || dataZoom.end === undefined) {
+                return;
+            }
+
+            // 计算滚轮滚动量 - 使用更灵敏的算法
+            let delta = 0;
+            if (e.deltaMode === 0) { // 像素模式
+                delta = e.deltaY * 0.001; // 缩放因子，可调整
+            } else if (e.deltaMode === 1) { // 行模式
+                delta = e.deltaY * 0.003; // 缩放因子，可调整
+            } else { // 页面模式
+                delta = e.deltaY * 0.0010; // 缩放因子，可调整
+            }
+
+            // 计算新的start和end
+            let newStart = dataZoom.start - delta;
+            let newEnd = dataZoom.end - delta;
+
+            // 边界检查 - 防止超出范围
+            if (newStart < 0) {
+                newStart = 0;
+                newEnd = Math.min(100, newEnd - newStart);
+            }
+
+            if (newEnd > 100) {
+                newEnd = 100;
+                newStart = Math.max(0, newStart - (newEnd - 100));
+            }
+
+            // 确保start小于end
+            if (newStart >= newEnd) {
+                if (delta > 0) {
+                    newStart = newEnd - 1;
+                } else {
+                    newEnd = newStart + 1;
+                }
+            }
+
+            // 确保范围在0-100之间
+            newStart = Math.max(0, Math.min(100, newStart));
+            newEnd = Math.max(0, Math.min(100, newEnd));
+
+            isSliding = true;
+
+            // 更新dataZoom
+            chartInstance.dispatchAction({
+                type: 'dataZoom',
+                start: newStart,
+                end: newEnd,
+                dataZoomIndex: 1
+            });
+
+            // 重置滑动标志
+            setTimeout(() => {
+                isSliding = false;
+            }, 50);
+        }
+
+        // 渲染交易记录表格
         function renderTradeTable(tradeRecords) {
             const tableBody = document.getElementById('tradeData');
             if (!tableBody) return;
@@ -1041,9 +1179,7 @@
                 return;
             }
 
-            console.log('渲染交易表格，原始记录数量:', tradeRecords.length);
-
-            // 修复：先按时间从早到晚排序，以确保我们按实际交易顺序过滤
+            // 先按时间从早到晚排序
             const timeSortedTrades = [...tradeRecords].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
@@ -1067,10 +1203,7 @@
                     currentRecord.position !== prevRecord.position) {
                     uniqueRecords.push(currentRecord);
                 }
-                // 否则，操作和仓位都没变化，跳过这条记录
             }
-
-            console.log('过滤后记录数量（按时间顺序）:', uniqueRecords.length);
 
             // 按日期降序排列用于显示（最新的在最上面）
             const displayRecords = [...uniqueRecords].sort((a, b) => {
@@ -1107,7 +1240,6 @@
                 return;
             }
 
-            // 按时间排序（从早到晚）
             const sortedTrades = [...tradeRecords].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
@@ -1115,13 +1247,11 @@
             const firstRecord = sortedTrades[0];
             const latestRecord = sortedTrades[sortedTrades.length - 1];
 
-            // 更新总收益 - 从equity计算
             if (firstRecord.equity !== undefined && latestRecord.equity !== undefined) {
                 const pnlEl = document.getElementById('totalPnl');
                 if (pnlEl) {
                     const initialEquity = Number(firstRecord.equity);
                     const latestEquity = Number(latestRecord.equity);
-
                     if (initialEquity > 0) {
                         const totalReturn = ((latestEquity - initialEquity) / initialEquity * 100);
                         pnlEl.textContent = totalReturn.toFixed(2) + '%';
@@ -1131,7 +1261,6 @@
                 }
             }
 
-            // 更新持仓数量
             if (latestRecord.position !== undefined) {
                 const positionsEl = document.getElementById('totalPositions');
                 if (positionsEl) {
@@ -1139,10 +1268,8 @@
                 }
             }
 
-            // 更新交易次数 - 使用过滤后的记录数量
             const tradeCountEl = document.getElementById('tradeCount');
             if (tradeCountEl) {
-                // 使用新的过滤逻辑计算交易次数
                 const uniqueRecords = [];
                 const timeSortedTrades = [...tradeRecords].sort((a, b) => {
                     return new Date(a.date) - new Date(b.date);
@@ -1150,29 +1277,23 @@
 
                 for (let i = 0; i < timeSortedTrades.length; i++) {
                     const currentRecord = timeSortedTrades[i];
-
                     if (i === 0) {
                         uniqueRecords.push(currentRecord);
                         continue;
                     }
-
                     const prevRecord = timeSortedTrades[i - 1];
-
                     if (currentRecord.operation !== prevRecord.operation ||
                         currentRecord.position !== prevRecord.position) {
                         uniqueRecords.push(currentRecord);
                     }
                 }
-
                 tradeCountEl.textContent = uniqueRecords.length.toString();
             }
 
-            // 更新最大回撤指标 - 基于每日净值数据
             if (dailyEquityData && dailyEquityData.length > 0) {
                 const drawdown = calculateMaxDrawdownFromEquity(dailyEquityData);
                 const maxDrawdownEl = document.getElementById('maxDrawdown');
                 const maxDrawdownDaysEl = document.getElementById('maxDrawdownDays');
-
                 if (maxDrawdownEl) {
                     maxDrawdownEl.textContent = `${drawdown.maxDrawdownPercent}%`;
                 }
@@ -1191,53 +1312,35 @@
                 const data = await loadJSON(dataFile);
                 currentData = data;
 
-                // 显示主容器
                 document.getElementById('mainContainer').style.display = 'block';
                 showLoading(false);
 
-                // 更新版本号（仅用于控制台输出）
                 if (data.config && data.config.version) {
                     dataVersion = data.config.version;
                 }
 
-                // 从trades数据生成K线数据（用于图表）
                 const klineData = generateKlineFromTrades(data.trades);
-
-                // 从trades数据生成净值数据（用于图表收益率曲线）
                 const equityData = generateEquityData(data.trades);
-
-                // 从trades数据生成每日结束时的净值数据（用于计算最大回撤）
                 const dailyEquityData = generateDailyEquityData(data.trades);
-
-                // 从净值数据生成收益百分比数据（用于图表收益率曲线）
                 const returnsData = generateReturnsFromEquity(equityData);
 
-                // 初始化图表
-                initCombinedChart(klineData, returnsData);
-
-                // 渲染交易表格
+                initCombinedChart(klineData, returnsData, data.trades);
                 renderTradeTable(data.trades);
-
-                // 更新统计数据
                 updateStats(data.trades, equityData, dailyEquityData);
 
-                // 更新最后更新时间
                 const lastUpdateEl = document.getElementById('lastUpdateTime');
                 if (lastUpdateEl && data.config && data.config.lastUpdated) {
                     lastUpdateEl.textContent = data.config.lastUpdated;
                 }
 
-                // 输出版本信息到控制台（不显示在页面上）
                 console.log(`✅ 数据加载成功`);
                 console.log(`📦 版本: ${dataVersion}`);
                 console.log(`🕐 最后更新: ${data.config ? data.config.lastUpdated : '未知'}`);
 
                 return true;
-
             } catch (error) {
                 console.error('刷新数据失败:', error);
                 let errorMessage = '无法加载数据文件。';
-
                 if (error.message.includes('404')) {
                     errorMessage = '数据文件未找到。请确保data.json文件与index.html在同一目录下。';
                 } else if (error.message.includes('Unexpected token')) {
@@ -1245,43 +1348,20 @@
                 } else if (error.message.includes('Failed to fetch')) {
                     errorMessage = '网络请求失败。请检查文件路径和服务器设置。';
                 }
-
                 showError(errorMessage);
                 return false;
             }
         }
 
-        // 强制刷新数据（绕过所有缓存）
-        function forceRefreshData() {
-            console.log('🔄 强制刷新数据...');
-            // 清除可能存在的缓存
-            if ('caches' in window) {
-                caches.keys().then(cacheNames => {
-                    cacheNames.forEach(cacheName => {
-                        caches.delete(cacheName);
-                    });
-                });
-            }
-
-            // 重新加载
-            refreshData();
-        }
-
         // 初始化页面
         async function initPage() {
             try {
-                // 检查免责声明
                 checkDisclaimer();
-
-                // 加载交易数据
                 await refreshData();
-
-                // 设置自动更新
                 if (currentData && currentData.config && currentData.config.autoUpdateInterval) {
                     console.log(`⏰ 设置自动更新间隔: ${currentData.config.autoUpdateInterval}ms`);
                     setInterval(refreshData, currentData.config.autoUpdateInterval);
                 }
-
             } catch (error) {
                 console.error('页面初始化失败:', error);
                 showError('页面初始化失败: ' + error.message);
