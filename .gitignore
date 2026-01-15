@@ -1,6 +1,102 @@
+# ================================
 # macOS
+# ================================
+._*
+.AppleDouble
+.com.apple.timemachine.donotpresent
+.com.apple.timemachine.supported
+.DocumentRevisions-V100
 .DS_Store
 .DS_Store?
-._*
+.fseventsd
+.LSOverride
 .Spotlight-V100
+.TemporaryItems
 .Trashes
+.VolumeIcon.icns
+Icon
+
+
+
+# ================================
+# 开发环境
+# ================================
+# 依赖
+node_modules/
+vendor/
+bower_components/
+jspm_packages/
+
+# 构建输出
+dist/
+build/
+out/
+.next/
+.nuxt/
+.serverless/
+.server/
+.turbo/
+.vs/
+
+# 缓存
+.cache/
+.parcel-cache/
+.yarn/
+.pnp/
+.eslintcache
+.stylelintcache
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!.env.example
+
+# 密钥
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pkcs12
+id_rsa
+id_dsa
+*.keystore
+*.jks
+secrets/
+credentials/
+config/secret*.json
+
+# ================================
+# IDE
+# ================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.c9/
+*.code-workspace
+
+# ================================
+# 操作系统
+# ================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
