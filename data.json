@@ -1,7 +1,7 @@
 {
   "config": {
-    "version": "1.0.1768497312",
-    "lastUpdated": "2026-01-15 12:15:12",
+    "version": "1.0.1768500009",
+    "lastUpdated": "2026-01-15 13:00:09",
     "autoUpdateInterval": 30000
   },
   "trades": [
@@ -3180,15 +3180,54 @@
     {
       "date": "2026-01-15 12:15:00",
       "open": 442.58,
-      "high": 442.68,
-      "low": 442.54,
-      "close": 442.63,
+      "high": 443.54,
+      "low": 442.07,
+      "close": 443.12,
       "operation": "BUY",
       "strategy": "TR",
       "position": 241,
       "price": 442.68,
       "pnl": 0.0,
-      "equity": 106909.95000000004
+      "equity": 107037.68000000005
+    },
+    {
+      "date": "2026-01-15 12:30:00",
+      "open": 443.16,
+      "high": 443.33,
+      "low": 442.07,
+      "close": 442.33,
+      "operation": "BUY",
+      "strategy": "TR",
+      "position": 241,
+      "price": 442.68,
+      "pnl": 0.0,
+      "equity": 106835.24000000003
+    },
+    {
+      "date": "2026-01-15 12:45:00",
+      "open": 442.32,
+      "high": 442.73,
+      "low": 441.1,
+      "close": 441.56,
+      "operation": "BUY",
+      "strategy": "TR",
+      "position": 241,
+      "price": 442.68,
+      "pnl": 0.0,
+      "equity": 106640.03000000004
+    },
+    {
+      "date": "2026-01-15 13:00:00",
+      "open": 441.51,
+      "high": 441.58,
+      "low": 441.46,
+      "close": 441.58,
+      "operation": "BUY",
+      "strategy": "TR",
+      "position": 241,
+      "price": 442.68,
+      "pnl": 0.0,
+      "equity": 106656.90000000004
     }
   ]
 }
