@@ -1,16 +1,49 @@
-## Hi there 👋
+# 美股日内量化策略 - 实时记录
 
-<!--
-**meigudongxie/meigudongxie** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+这是一个美股量化策略的实时记录页面。
 
-Here are some ideas to get you started:
+## 🎯 这是什么？
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+- **实时展示**：我实盘运行的美股日内策略记录
+- **延迟**：数据延迟1-30分钟
+- **频率**：每交易日约1-5笔交易
+- **标的**：当前主要为TSLA
+- **目的**：策略透明化实验与个人记录
+
+## 📊 实时页面
+
+👉 **https://meigudongxie.github.io**
+
+页面包含：
+- 关键绩效指标
+- K线图与资金曲线
+- 完整交易记录
+
+## ⚠️ 重要说明
+
+**这不是投资建议，不是信号服务，不是财富密码。**
+
+这只是我个人的交易记录，用于：
+1. 自我监督与纪律执行
+2. 策略逻辑的公开验证
+3. 记录这段转型期的心路历程
+
+过往表现不预示未来结果。市场有风险，请独立思考。
+
+## 🛠 技术细节
+
+- 策略运行于实盘账户
+- 数据通过API自动同步到GitHub
+- 前端使用ECharts可视化
+- 所有历史数据可审计
+
+## 📈 策略背景
+
+- 美股交易经验：10年
+- 量化实盘运行：2年
+- 编程水平：会写代码的交易员
+- 当前状态：专注构建可验证的交易系统
+
+---
+
+*"在这个充满噪音的市场里，我选择相信数据和逻辑。"*
