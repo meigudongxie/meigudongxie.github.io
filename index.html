@@ -52,8 +52,7 @@
         header {
             text-align: center;
             padding: 20px 0;
-            margin-bottom: 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
         }
 
         h1 {
@@ -62,7 +61,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 00px;
             font-weight: 700;
         }
 
@@ -72,7 +71,7 @@
             background: rgba(40, 40, 40, 0.8);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 8px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -97,7 +96,7 @@
 
         .chart-container {
             display: flex;
-            margin-bottom: 30px;
+            margin-bottom: 8px;
         }
 
         .chart-box {
@@ -111,13 +110,53 @@
 
         .chart-title {
             font-size: 1.4rem;
-            margin-bottom: 20px;
+            margin-bottom: 0px;
             color: #fff;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .chart-title i {
             color: #4cd964;
+        }
+
+        /* K线数量选择器样式 */
+        .kline-count-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .kline-count-btn {
+            background: rgba(60, 60, 60, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            min-width: 50px;
+            text-align: center;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kline-count-btn:hover {
+            background: rgba(80, 80, 80, 0.9);
+            color: #fff;
+        }
+
+        .kline-count-btn.active {
+            background: rgba(76, 217, 100, 0.2);
+            color: #4cd964;
+            border-color: #4cd964;
         }
 
         .chart {
@@ -346,9 +385,18 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 0.10;
+                box-shadow: 0 0 15px rgba(76, 217, 100, 0.3);
+            }
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 15px rgba(76, 217, 100, 0.8);
+            }
+            100% {
+                opacity: 0.10;
+                box-shadow: 0 0 15px rgba(76, 217, 100, 0.3);
+            }
         }
 
         @media (max-width: 768px) {
@@ -361,6 +409,15 @@
             .modal-content { width: 95%; max-height: 80vh; padding: 20px; }
             .modal-title { font-size: 1.5rem; }
             .modal-body p { font-size: 1rem; }
+            .chart-title {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .kline-count-selector {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -411,7 +468,16 @@
         <div class="chart-container">
             <div class="chart-box">
                 <div class="chart-title">
-                    <span><i class="fas fa-chart-candlestick"></i> 价格与收益</span>
+                    <div style="text-align: center;">
+                        <span><i class="fas fa-chart-candlestick"></i> 价格与收益</span>
+                    </div>
+                    <div class="kline-count-selector">
+                        <button class="kline-count-btn" data-count="26">1天</button>
+                        <button class="kline-count-btn active" data-count="130">1周</button>
+                        <button class="kline-count-btn" data-count="546">1月</button>
+                        <button class="kline-count-btn" data-count="6552">1年</button>
+                        <button class="kline-count-btn" data-count="999999">全部</button>
+                    </div>
                 </div>
                 <div id="combinedChart" class="chart"></div>
             </div>
@@ -470,6 +536,53 @@
     </div>
 
     <script>
+        // ========== K线配置参数 ==========
+        const KLINE_CONFIG = {
+            // 基准设置
+            BASE_SCREEN_WIDTH: 2560,      // CSS像素宽度
+            BASE_COUNT: 100,              // 基准K线数量
+            BASE_PIXEL_WIDTH: 9,          // 基准像素宽度（100根K线时）
+
+            // 边界限制
+            MIN_PIXEL_WIDTH: 1,           // 最小像素宽度
+            MAX_PIXEL_WIDTH: 40,          // 最大像素宽度
+
+            // 间距配置
+            GAP_RATIO: 1.0,               // 间距占宽度的比例（1.0表示间距=宽度）
+            MIN_GAP_RATIO: 0.2,           // 最小间距比例
+            MAX_GAP_RATIO: 1.0,           // 最大间距比例
+
+            // 标记点配置
+            MARKER_SIZE_RATIO: 0.8,       // 标记点大小与K线宽度的比例
+            MIN_MARKER_SIZE: 1,           // 最小标记点大小
+            MAX_MARKER_SIZE: 32,          // 最大标记点大小
+
+            // 缩放响应参数
+            SCALE_FACTOR_MULTIPLIER: 1.0, // 整体缩放倍数
+
+            // 宽度分段配置
+            WIDTH_SEGMENTS: [
+                { maxCount: 20, width: 19 },     // 20根以内，19像素
+                { maxCount: 40, width: 17 },
+                { maxCount: 60, width: 15 },
+                { maxCount: 80, width: 13 },
+                { maxCount: 100, width: 11 },
+                { maxCount: 150, width: 9 },
+                { maxCount: 200, width: 7 },
+                { maxCount: 300, width: 5 },
+                { maxCount: 500, width: 3 },
+                { maxCount: Infinity, width: 1 } // 500根以上，1像素
+            ],
+
+            // 间距分段配置
+            GAP_SEGMENTS: [
+                { maxCount: 50, gapRatio: 0.8 },   // 20根以内，间距=0.8倍宽度
+                { maxCount: 100, gapRatio: 0.6 },
+                { maxCount: 200, gapRatio: 0.4 },
+                { maxCount: Infinity, gapRatio: 0.2 } // 200根以上，间距=0.2倍宽度
+            ]
+        };
+
         let chartInstance = null;
         let currentData = null;
         let dataVersion = "1.0.0";
@@ -479,6 +592,7 @@
         let wheelSpeedFactor = 0; // 滚轮速度因子
         let cumulativeDelta = 0; // 累积的滚动量
         let lastUpdateTime = 0; // 上次更新时间
+        let currentKlineCount = 100; // 当前默认显示的K线数量
 
         // 免责声明相关
         function showDisclaimerModal() {
@@ -818,6 +932,177 @@
             return { buyMarkers, sellMarkers };
         }
 
+        // ========== K线宽度计算函数 ==========
+
+        // 计算K线像素宽度
+        function calculatePixelWidth(visibleCount, chartWidth) {
+            const config = KLINE_CONFIG;
+
+            // 屏幕缩放因子
+            const scaleFactor = chartWidth / config.BASE_SCREEN_WIDTH;
+
+            // 根据可见K线数量查找对应的宽度配置
+            for (const segment of config.WIDTH_SEGMENTS) {
+                if (visibleCount <= segment.maxCount) {
+                    // 基础像素宽度
+                    let pixelWidth = segment.width;
+
+                    // 应用屏幕缩放
+                    pixelWidth *= scaleFactor;
+
+                    // 应用整体缩放倍数
+                    pixelWidth *= config.SCALE_FACTOR_MULTIPLIER;
+
+                    // 边界限制
+                    pixelWidth = Math.max(
+                        config.MIN_PIXEL_WIDTH,
+                        Math.min(config.MAX_PIXEL_WIDTH, pixelWidth)
+                    );
+
+                    return pixelWidth;
+                }
+            }
+
+            // 默认返回最小宽度
+            return config.MIN_PIXEL_WIDTH;
+        }
+
+        // 计算间距比例
+        function calculateGapRatio(visibleCount) {
+            const config = KLINE_CONFIG;
+
+            // 根据可见K线数量查找对应的间距配置
+            for (const segment of config.GAP_SEGMENTS) {
+                if (visibleCount <= segment.maxCount) {
+                    return Math.max(
+                        config.MIN_GAP_RATIO,
+                        Math.min(config.MAX_GAP_RATIO, segment.gapRatio)
+                    );
+                }
+            }
+
+            // 默认返回基础间距比例
+            return config.GAP_RATIO;
+        }
+
+        // 计算标记点大小
+        function calculateMarkerSize(klineWidth) {
+            const config = KLINE_CONFIG;
+
+            // 根据K线宽度计算标记点大小
+            let markerSize = klineWidth * config.MARKER_SIZE_RATIO;
+
+            // 边界限制
+            markerSize = Math.max(
+                config.MIN_MARKER_SIZE,
+                Math.min(config.MAX_MARKER_SIZE, markerSize)
+            );
+
+            return markerSize;
+        }
+
+        // 计算并更新K线宽度
+        function updateBarWidth() {
+            if (!chartInstance) return;
+
+            const option = chartInstance.getOption();
+            if (!option.dataZoom || option.dataZoom.length < 2) return;
+
+            const dataZoom = option.dataZoom[1]; // 使用slider的dataZoom
+            const xAxisData = option.xAxis[0].data || [];
+            const dataLength = xAxisData.length;
+
+            if (dataLength === 0) return;
+
+            // 获取当前显示的K线数量
+            const startPercent = dataZoom.start || 0;
+            const endPercent = dataZoom.end || 100;
+            const visibleCount = Math.round((endPercent - startPercent) / 100 * dataLength);
+
+            if (visibleCount <= 0) return;
+
+            // 获取图表容器实际宽度
+            const chartWidth = chartInstance.getWidth();
+
+            if (!chartWidth || chartWidth <= 0) {
+                console.warn('无法获取图表宽度，延迟重试...');
+                setTimeout(updateBarWidth, 100);
+                return;
+            }
+
+            // 1. 计算K线像素宽度
+            let pixelWidth = calculatePixelWidth(visibleCount, chartWidth);
+
+            // 2. 计算间距比例
+            let gapRatio = calculateGapRatio(visibleCount);
+
+            // 3. 计算间距像素值
+            const gapPixels = pixelWidth * gapRatio;
+
+            // 4. 计算每个K线在x轴上的总跨度（K线宽度+间距）
+            const totalSpanPerKline = pixelWidth + gapPixels;
+
+            // 5. 计算x轴有效宽度（减去左右边距）
+            const xAxisRange = chartWidth * 0.93; // grid左右边距分别为3%和4%
+
+            // 6. 计算K线数量是否适合当前宽度
+            const requiredWidth = visibleCount * totalSpanPerKline;
+
+            if (requiredWidth > xAxisRange) {
+                // 如果总宽度超过有效宽度，按比例缩小
+                const scaleFactor = xAxisRange / requiredWidth;
+                pixelWidth *= scaleFactor;
+                gapRatio *= scaleFactor;
+            }
+
+            // 7. 边界检查
+            pixelWidth = Math.max(
+                KLINE_CONFIG.MIN_PIXEL_WIDTH,
+                Math.min(KLINE_CONFIG.MAX_PIXEL_WIDTH, pixelWidth)
+            );
+
+            // 8. 计算百分比宽度和间距
+            const klineSpan = xAxisRange / Math.max(visibleCount, 1);
+            const barWidthPercent = (pixelWidth / klineSpan) * 100;
+            const gapPercent = (pixelWidth * gapRatio / klineSpan) * 100;
+
+            // 9. 计算标记点大小
+            const markerSize = calculateMarkerSize(pixelWidth);
+
+            console.log(
+                `📊 K线配置: 数量=${visibleCount}, ` +
+                `宽度=${pixelWidth.toFixed(1)}px, ` +
+                `间距=${gapRatio.toFixed(1)}倍, ` +
+                `标记点=${markerSize.toFixed(1)}px`
+            );
+
+            // 10. 更新图表选项 - 只更新K线系列
+            const currentOption = chartInstance.getOption();
+            const newOption = {
+                series: [
+                    {
+                        type: 'candlestick',
+                        barWidth: barWidthPercent + '%',
+                        barCategoryGap: gapPercent + '%',
+                        barMinWidth: 1,
+                        barMaxWidth: 100
+                    },
+                    // 保持收益线不变
+                    currentOption.series[1],
+                    {
+                        type: 'scatter',
+                        symbolSize: markerSize
+                    },
+                    {
+                        type: 'scatter',
+                        symbolSize: markerSize
+                    }
+                ]
+            };
+
+            chartInstance.setOption(newOption, false, true);
+        }
+
         // 初始化合并图表
         function initCombinedChart(klineData, returnsData, tradeRecords) {
             const chartDom = document.getElementById('combinedChart');
@@ -895,7 +1180,7 @@
                 legend: {
                     data: ['价格', '收益', '买入', '卖出'],
                     textStyle: { color: '#aaa' },
-                    top: 10
+                    top: 10,
                 },
                 dataZoom: [
                     {
@@ -907,7 +1192,7 @@
                         moveOnMouseMove: true,    // 图表区域内鼠标拖拽平移
                         zoomLock: true,          // 禁用缩放
                         zoomSensitivity: 0.5,     // 缩放灵敏度，值越小越慢
-                        start: Math.max(0, 100 - Math.min(70, klineData.length) / klineData.length * 100),
+                        start: Math.max(0, 100 - Math.min(currentKlineCount, klineData.length) / klineData.length * 100),
                         end: 100,
                         minValueSpan: Math.min(20, klineData.length),
                         maxValueSpan: Math.min(2000000, klineData.length)
@@ -916,16 +1201,16 @@
                         type: 'slider',
                         xAxisIndex: 0,
                         show: true,
-                        start: Math.max(0, 100 - Math.min(70, klineData.length) / klineData.length * 100),
+                        start: Math.max(0, 100 - Math.min(currentKlineCount, klineData.length) / klineData.length * 100),
                         end: 100,
-                        bottom: 25,
-                        height: 20,
+                        bottom: 15, // 控制点1：滑块距离容器底部的距离（像素值），值越大滑块越靠上
+                        height: 20, // 滑块条的高度
                         backgroundColor: 'rgba(150, 150, 150, 0.2)',
                         borderColor: 'rgba(150, 150, 150, 0.3)',
-                        fillerColor: 'rgba(150, 150, 150, 0.4)',
+                        fillerColor: 'rgba(150, 150, 150, 1.0)',
                         handleStyle: {
-                            color: 'rgba(180, 180, 180, 0.8)',
-                            borderColor: 'rgba(200, 200, 200, 0.8)',
+                            color: 'rgba(240, 240, 240, 1.0)',
+                            borderColor: 'rgba(240, 240, 240, 1.0)',
                             borderWidth: 1
                         },
                         textStyle: { color: '#aaa' },
@@ -943,8 +1228,8 @@
                 grid: {
                     left: '3%',
                     right: '4%',
-                    bottom: '20%',
-                    top: '15%'
+                    bottom: '15%', // 控制点2：图表区域（包括K线、坐标轴、日期标签）距离容器底部的距离（百分比），值越大图表越靠上
+                    top: '10%'    // 图表区域距离容器顶部的距离
                 },
                 xAxis: {
                     type: 'category',
@@ -960,8 +1245,10 @@
                                 return parts[0];
                             }
                             return value;
-                        }
-                    }
+                        },
+                        margin: 8, // 控制点3：日期标签与x轴线之间的距离
+                    },
+                    offset: 0, // 控制点4：x轴距离图表区域底部的距离（内部偏移），正值向下偏移，负值向上偏移
                 },
                 yAxis: [
                     {
@@ -1001,10 +1288,9 @@
                             borderColor0: '#4cd964',
                             borderWidth: 1
                         },
-                        barWidth: 10,
-                        barMinWidth: 6,
-                        barMaxWidth: 12,
-                        barCategoryGap: '40%',
+                        // 初始宽度设为自动，后续会由updateBarWidth更新
+                        barWidth: 'auto',
+                        barCategoryGap: '30%',
                         yAxisIndex: 0
                     },
                     {
@@ -1015,7 +1301,7 @@
                         smooth: true,
                         symbol: 'none',
                         lineStyle: {
-                            width: 3,
+                            width: 2,
                             color: '#00c9ff'
                         },
                         itemStyle: {
@@ -1033,10 +1319,10 @@
                         type: 'scatter',
                         data: tradeMarkers.buyMarkers.map(marker => marker.value),
                         symbol: 'circle',
-                        symbolSize: 8,
+                        symbolSize: 6, // 初始大小，会被updateBarWidth覆盖
                         symbolRotate: 0,
                         itemStyle: {
-                            color: '#FF77A9',
+                            color: '#FFAAAA',
                             borderWidth: 0
                         },
                         yAxisIndex: 0,
@@ -1047,11 +1333,11 @@
                         type: 'scatter',
                         data: tradeMarkers.sellMarkers.map(marker => marker.value),
                         symbol: 'circle',
-                        symbolSize: 8,
+                        symbolSize: 6, // 初始大小，会被updateBarWidth覆盖
                         symbolRotate: 0,
                         itemStyle: {
                             color: '#F0FFF0',
-                            borderWidth: 1
+                            borderWidth: 0
                         },
                         yAxisIndex: 0,
                         zlevel: 20
@@ -1064,8 +1350,18 @@
             // 自定义滚轮控制逻辑
             setupCustomWheelControl(chartDom);
 
+            // 计算并应用动态宽度
+            updateBarWidth();
+
+            // 监听窗口大小变化
             window.addEventListener('resize', function() {
                 chartInstance.resize();
+                updateBarWidth();
+            });
+
+            // 监听dataZoom变化
+            chartInstance.on('dataZoom', function(params) {
+                updateBarWidth();
             });
 
             return chartInstance;
@@ -1304,6 +1600,36 @@
             }
         }
 
+        // 设置K线数量选择器
+        function setupKlineCountSelector() {
+            const klineCountButtons = document.querySelectorAll('.kline-count-btn');
+
+            klineCountButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的active类
+                    klineCountButtons.forEach(btn => btn.classList.remove('active'));
+
+                    // 为当前点击的按钮添加active类
+                    this.classList.add('active');
+
+                    // 获取K线数量
+                    const klineCount = parseInt(this.getAttribute('data-count'));
+                    currentKlineCount = klineCount;
+
+                    console.log(`设置K线显示数量: ${klineCount}`);
+
+                    // 如果有数据，重新初始化图表
+                    if (currentData && currentData.trades) {
+                        const klineData = generateKlineFromTrades(currentData.trades);
+                        const equityData = generateEquityData(currentData.trades);
+                        const returnsData = generateReturnsFromEquity(equityData);
+
+                        initCombinedChart(klineData, returnsData, currentData.trades);
+                    }
+                });
+            });
+        }
+
         // 刷新数据
         async function refreshData() {
             try {
@@ -1359,6 +1685,9 @@
             try {
                 checkDisclaimer();
                 await refreshData();
+                // 设置K线数量选择器
+                setupKlineCountSelector();
+
                 if (currentData && currentData.config && currentData.config.autoUpdateInterval) {
                     console.log(`⏰ 设置自动更新间隔: ${currentData.config.autoUpdateInterval}ms`);
                     setInterval(refreshData, currentData.config.autoUpdateInterval);
