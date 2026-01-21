@@ -452,8 +452,8 @@
                 <div class="stat-label">最大回撤</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="maxDrawdownDays">-</div>
-                <div class="stat-label">最大回撤天数</div>
+                <div class="stat-value" id="longestDrawdownDuration">-</div>
+                <div class="stat-label">最长回撤持续期</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value" id="totalPositions">-</div>
@@ -788,59 +788,61 @@
             });
         }
 
-        // 计算最大回撤和最大回撤恢复天数
+        // 计算最大回撤和最大回撤持续时间
         function calculateMaxDrawdownFromEquity(dailyEquityData) {
             if (!dailyEquityData || dailyEquityData.length < 2) {
-                return { maxDrawdownPercent: 0, maxDrawdownDays: 0 };
+                return { maxDrawdownPercent: 0, longestDrawdownDuration: 0 };
             }
 
             let maxDrawdown = 0;
             let maxRecoveryDays = 0;
-            let currentPeak = dailyEquityData[0][1];
-            let currentPeakDate = dailyEquityData[0][0];
-            let currentTrough = dailyEquityData[0][1];
-            let currentTroughDate = dailyEquityData[0][0];
+            let peak = dailyEquityData[0][1];
+            let peakDate = dailyEquityData[0][0];
             let isInDrawdown = false;
+            let drawdownStartDate = null;
 
             for (let i = 1; i < dailyEquityData.length; i++) {
                 const currentEquity = dailyEquityData[i][1];
                 const currentDate = dailyEquityData[i][0];
 
-                // 检查是否是新的历史峰值
-                if (currentEquity > currentPeak) {
-                    // 如果之前处于回撤状态，现在突破了前一个峰值
-                    if (isInDrawdown) {
-                        // 计算回撤恢复天数
+                // 更新历史峰值
+                if (currentEquity > peak) {
+                    peak = currentEquity;
+                    peakDate = currentDate;
+
+                    // 如果之前处于回撤状态，现在回撤结束
+                    if (isInDrawdown && drawdownStartDate !== null) {
+                        // 计算回撤持续时间
                         try {
-                            const troughDateObj = new Date(currentTroughDate);
-                            const currentDateObj = new Date(currentDate);
-                            const timeDiff = currentDateObj.getTime() - troughDateObj.getTime();
-                            const recoveryDays = Math.floor(timeDiff / (1000 * 3600 * 24));
+                            const startDate = new Date(drawdownStartDate);
+                            const endDate = new Date(currentDate);
+
+                            // 与Python代码一致：计算两个日期之间的完整天数
+                            const timeDiff = endDate.getTime() - startDate.getTime();
+                            const recoveryDays = Math.round(timeDiff / (1000 * 3600 * 24));
 
                             if (recoveryDays > maxRecoveryDays) {
                                 maxRecoveryDays = recoveryDays;
                             }
 
                             isInDrawdown = false;
+                            drawdownStartDate = null;
                         } catch (e) {
-                            console.error('计算恢复天数错误:', e);
+                            console.error('计算回撤持续时间错误:', e);
                         }
                     }
-
-                    // 更新峰值
-                    currentPeak = currentEquity;
-                    currentPeakDate = currentDate;
-                    currentTrough = currentEquity; // 重置低谷
-                    currentTroughDate = currentDate;
                 }
-                // 检查是否是新的低谷
-                else if (currentEquity < currentTrough) {
-                    currentTrough = currentEquity;
-                    currentTroughDate = currentDate;
-                    isInDrawdown = true;
+                // 检查是否进入回撤状态
+                else if (currentEquity < peak) {
+                    // 如果当前净值低于峰值，且不在回撤状态，则开始新的回撤
+                    if (!isInDrawdown) {
+                        isInDrawdown = true;
+                        // 注意：这里使用峰值日期作为回撤开始，与Python代码一致
+                        drawdownStartDate = peakDate;
+                    }
 
                     // 计算当前回撤
-                    const drawdown = (currentPeak - currentTrough) / currentPeak * 100;
+                    const drawdown = (peak - currentEquity) / peak * 100;
                     if (drawdown > maxDrawdown) {
                         maxDrawdown = drawdown;
                     }
@@ -848,24 +850,24 @@
             }
 
             // 如果在数据结束时仍处于回撤状态
-            if (isInDrawdown) {
+            if (isInDrawdown && drawdownStartDate !== null) {
                 try {
-                    const troughDateObj = new Date(currentTroughDate);
-                    const lastDateObj = new Date(dailyEquityData[dailyEquityData.length - 1][0]);
-                    const timeDiff = lastDateObj.getTime() - troughDateObj.getTime();
-                    const currentRecoveryDays = Math.floor(timeDiff / (1000 * 3600 * 24));
+                    const startDate = new Date(drawdownStartDate);
+                    const lastDate = new Date(dailyEquityData[dailyEquityData.length - 1][0]);
+                    const timeDiff = lastDate.getTime() - startDate.getTime();
+                    const currentRecoveryDays = Math.round(timeDiff / (1000 * 3600 * 24));
 
                     if (currentRecoveryDays > maxRecoveryDays) {
                         maxRecoveryDays = currentRecoveryDays;
                     }
                 } catch (e) {
-                    console.error('计算最终恢复天数错误:', e);
+                    console.error('计算最终回撤持续时间错误:', e);
                 }
             }
 
             return {
                 maxDrawdownPercent: maxDrawdown.toFixed(2),
-                maxDrawdownDays: maxRecoveryDays
+                longestDrawdownDuration: maxRecoveryDays
             };
         }
 
@@ -1557,7 +1559,7 @@
         // 更新统计数据
         function updateStats(tradeRecords, equityData, dailyEquityData) {
             if (!tradeRecords || tradeRecords.length === 0) {
-                ['totalPnl', 'maxDrawdown', 'maxDrawdownDays', 'totalPositions', 'tradeCount'].forEach(id => {
+                ['totalPnl', 'maxDrawdown', 'longestDrawdownDuration', 'totalPositions', 'tradeCount'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.textContent = '-';
                 });
@@ -1617,12 +1619,12 @@
             if (dailyEquityData && dailyEquityData.length > 0) {
                 const drawdown = calculateMaxDrawdownFromEquity(dailyEquityData);
                 const maxDrawdownEl = document.getElementById('maxDrawdown');
-                const maxDrawdownDaysEl = document.getElementById('maxDrawdownDays');
+                const longestDrawdownDurationEl = document.getElementById('longestDrawdownDuration');
                 if (maxDrawdownEl) {
                     maxDrawdownEl.textContent = `${drawdown.maxDrawdownPercent}%`;
                 }
-                if (maxDrawdownDaysEl) {
-                    maxDrawdownDaysEl.textContent = `${drawdown.maxDrawdownDays}天`;
+                if (longestDrawdownDurationEl) {
+                    longestDrawdownDurationEl.textContent = `${drawdown.longestDrawdownDuration}天`;
                 }
             }
         }
