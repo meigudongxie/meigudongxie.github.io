@@ -1,7 +1,7 @@
 {
   "config": {
-    "version": "1.0.1773672386",
-    "lastUpdated": "2026-03-16 22:46:26",
+    "version": "1.0.1773673263",
+    "lastUpdated": "2026-03-16 23:01:03",
     "autoUpdateInterval": 60000
   },
   "trades": [
@@ -185362,15 +185362,28 @@
     {
       "date": "2026-03-16 10:45:00",
       "open": 400.54,
-      "high": 400.98,
-      "low": 400.48,
-      "close": 400.89,
+      "high": 401.55,
+      "low": 399.95,
+      "close": 400.9,
       "operation": "BUY",
       "strategy": "RE",
       "position": 204,
       "price": 396.22,
       "pnl": 0.0,
-      "equity": 162939.54999999906
+      "equity": 162941.58999999904
+    },
+    {
+      "date": "2026-03-16 11:00:00",
+      "open": 400.91,
+      "high": 401.07,
+      "low": 400.7,
+      "close": 401.04,
+      "operation": "BUY",
+      "strategy": "RE",
+      "position": 204,
+      "price": 396.22,
+      "pnl": 0.0,
+      "equity": 162970.14999999906
     }
   ]
 }
