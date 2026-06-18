@@ -448,6 +448,10 @@
                 <div class="stat-label">总收益</div>
             </div>
             <div class="stat-item">
+                <div class="stat-value" id="annualizedReturn">-</div>
+                <div class="stat-label">平均年化收益</div>
+            </div>
+            <div class="stat-item">
                 <div class="stat-value" id="maxDrawdown">-</div>
                 <div class="stat-label">最大回撤</div>
             </div>
@@ -456,8 +460,8 @@
                 <div class="stat-label">最长回撤持续期</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="totalPositions">-</div>
-                <div class="stat-label">持仓数量</div>
+                <div class="stat-value" id="sharpeRatio">-</div>
+                <div class="stat-label">夏普</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value" id="tradeCount">-</div>
@@ -533,31 +537,20 @@
     <script>
         // ========== K线配置参数 ==========
         const KLINE_CONFIG = {
-            // 基准设置
-            BASE_SCREEN_WIDTH: 2560,      // CSS像素宽度
-            BASE_COUNT: 100,              // 基准K线数量
-            BASE_PIXEL_WIDTH: 9,          // 基准像素宽度（100根K线时）
-
-            // 边界限制
-            MIN_PIXEL_WIDTH: 1,           // 最小像素宽度
-            MAX_PIXEL_WIDTH: 40,          // 最大像素宽度
-
-            // 间距配置
-            GAP_RATIO: 1.0,               // 间距占宽度的比例（1.0表示间距=宽度）
-            MIN_GAP_RATIO: 0.2,           // 最小间距比例
-            MAX_GAP_RATIO: 1.0,           // 最大间距比例
-
-            // 标记点配置
-            MARKER_SIZE_RATIO: 0.8,       // 标记点大小与K线宽度的比例
-            MIN_MARKER_SIZE: 1,           // 最小标记点大小
-            MAX_MARKER_SIZE: 32,          // 最大标记点大小
-
-            // 缩放响应参数
-            SCALE_FACTOR_MULTIPLIER: 1.0, // 整体缩放倍数
-
-            // 宽度分段配置
+            BASE_SCREEN_WIDTH: 2560,
+            BASE_COUNT: 100,
+            BASE_PIXEL_WIDTH: 9,
+            MIN_PIXEL_WIDTH: 1,
+            MAX_PIXEL_WIDTH: 40,
+            GAP_RATIO: 1.0,
+            MIN_GAP_RATIO: 0.2,
+            MAX_GAP_RATIO: 1.0,
+            MARKER_SIZE_RATIO: 0.8,
+            MIN_MARKER_SIZE: 1,
+            MAX_MARKER_SIZE: 32,
+            SCALE_FACTOR_MULTIPLIER: 1.0,
             WIDTH_SEGMENTS: [
-                { maxCount: 20, width: 19 },     // 20根以内，19像素
+                { maxCount: 20, width: 19 },
                 { maxCount: 40, width: 17 },
                 { maxCount: 60, width: 15 },
                 { maxCount: 80, width: 13 },
@@ -566,28 +559,22 @@
                 { maxCount: 200, width: 7 },
                 { maxCount: 300, width: 5 },
                 { maxCount: 500, width: 3 },
-                { maxCount: Infinity, width: 1 } // 500根以上，1像素
+                { maxCount: Infinity, width: 1 }
             ],
-
-            // 间距分段配置
             GAP_SEGMENTS: [
-                { maxCount: 50, gapRatio: 0.8 },   // 20根以内，间距=0.8倍宽度
+                { maxCount: 50, gapRatio: 0.8 },
                 { maxCount: 100, gapRatio: 0.6 },
                 { maxCount: 200, gapRatio: 0.4 },
-                { maxCount: Infinity, gapRatio: 0.2 } // 200根以上，间距=0.2倍宽度
+                { maxCount: Infinity, gapRatio: 0.2 }
             ]
         };
 
         let chartInstance = null;
         let currentData = null;
         let dataVersion = "1.0.0";
-        let isSliding = false; // 防止重复滚动的标志
-        let slideCooldown = false; // 冷却标志
-        let lastWheelTime = 0; // 上次滚轮事件时间
-        let wheelSpeedFactor = 0; // 滚轮速度因子
-        let cumulativeDelta = 0; // 累积的滚动量
-        let lastUpdateTime = 0; // 上次更新时间
-        let currentKlineCount = 100; // 当前默认显示的K线数量
+        let isSliding = false;
+        let lastWheelTime = 0;
+        let currentKlineCount = 100;
 
         // 免责声明相关
         function showDisclaimerModal() {
@@ -647,11 +634,11 @@
             }
         }
 
+        // ========== 图表数据生成函数（100%保留） ==========
+
         // 从trades数据生成K线数据
         function generateKlineFromTrades(trades) {
-            if (!trades || trades.length === 0) {
-                return [];
-            }
+            if (!trades || trades.length === 0) return [];
 
             const sortedTrades = [...trades].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
@@ -686,9 +673,7 @@
 
         // 从trades数据生成净值数据
         function generateEquityData(trades) {
-            if (!trades || trades.length === 0) {
-                return [];
-            }
+            if (!trades || trades.length === 0) return [];
 
             const sortedTrades = [...trades].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
@@ -720,9 +705,7 @@
 
         // 从trades数据生成每日结束时的净值数据
         function generateDailyEquityData(trades) {
-            if (!trades || trades.length === 0) {
-                return [];
-            }
+            if (!trades || trades.length === 0) return [];
 
             const sortedTrades = [...trades].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
@@ -769,14 +752,10 @@
 
         // 从净值数据生成收益百分比数据
         function generateReturnsFromEquity(equityData) {
-            if (!equityData || equityData.length === 0) {
-                return [];
-            }
+            if (!equityData || equityData.length === 0) return [];
 
             const initialEquity = equityData[0][1];
-            if (initialEquity <= 0) {
-                return [];
-            }
+            if (initialEquity <= 0) return [];
 
             return equityData.map(item => {
                 const currentEquity = item[1];
@@ -786,114 +765,6 @@
                     parseFloat(returnPercent.toFixed(2))
                 ];
             });
-        }
-
-        // 计算最大回撤和最大回撤持续时间
-        function calculateMaxDrawdownFromEquity(dailyEquityData) {
-            if (!dailyEquityData || dailyEquityData.length < 2) {
-                return { maxDrawdownPercent: 0, longestDrawdownDuration: 0 };
-            }
-
-            let maxDrawdown = 0;
-            let maxRecoveryDays = 0;
-            let peak = dailyEquityData[0][1];
-            let peakDate = dailyEquityData[0][0];
-            let isInDrawdown = false;
-            let drawdownStartDate = null;
-
-            for (let i = 1; i < dailyEquityData.length; i++) {
-                const currentEquity = dailyEquityData[i][1];
-                const currentDate = dailyEquityData[i][0];
-
-                // 更新历史峰值
-                if (currentEquity > peak) {
-                    peak = currentEquity;
-                    peakDate = currentDate;
-
-                    // 如果之前处于回撤状态，现在回撤结束
-                    if (isInDrawdown && drawdownStartDate !== null) {
-                        // 计算回撤持续时间
-                        try {
-                            const startDate = new Date(drawdownStartDate);
-                            const endDate = new Date(currentDate);
-
-                            // 与Python代码一致：计算两个日期之间的完整天数
-                            const timeDiff = endDate.getTime() - startDate.getTime();
-                            const recoveryDays = Math.round(timeDiff / (1000 * 3600 * 24));
-
-                            if (recoveryDays > maxRecoveryDays) {
-                                maxRecoveryDays = recoveryDays;
-                            }
-
-                            isInDrawdown = false;
-                            drawdownStartDate = null;
-                        } catch (e) {
-                            console.error('计算回撤持续时间错误:', e);
-                        }
-                    }
-                }
-                // 检查是否进入回撤状态
-                else if (currentEquity < peak) {
-                    // 如果当前净值低于峰值，且不在回撤状态，则开始新的回撤
-                    if (!isInDrawdown) {
-                        isInDrawdown = true;
-                        // 注意：这里使用峰值日期作为回撤开始，与Python代码一致
-                        drawdownStartDate = peakDate;
-                    }
-
-                    // 计算当前回撤
-                    const drawdown = (peak - currentEquity) / peak * 100;
-                    if (drawdown > maxDrawdown) {
-                        maxDrawdown = drawdown;
-                    }
-                }
-            }
-
-            // 如果在数据结束时仍处于回撤状态
-            if (isInDrawdown && drawdownStartDate !== null) {
-                try {
-                    const startDate = new Date(drawdownStartDate);
-                    const lastDate = new Date(dailyEquityData[dailyEquityData.length - 1][0]);
-                    const timeDiff = lastDate.getTime() - startDate.getTime();
-                    const currentRecoveryDays = Math.round(timeDiff / (1000 * 3600 * 24));
-
-                    if (currentRecoveryDays > maxRecoveryDays) {
-                        maxRecoveryDays = currentRecoveryDays;
-                    }
-                } catch (e) {
-                    console.error('计算最终回撤持续时间错误:', e);
-                }
-            }
-
-            return {
-                maxDrawdownPercent: maxDrawdown.toFixed(2),
-                longestDrawdownDuration: maxRecoveryDays
-            };
-        }
-
-        // 格式化日期显示
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            try {
-                if (dateStr.length === 15) {
-                    const datePart = dateStr.substring(0, 8);
-                    const timePart = dateStr.substring(9);
-                    const year = datePart.substring(0, 4);
-                    const month = datePart.substring(4, 6);
-                    const day = datePart.substring(6, 8);
-                    return `${year}-${month}-${day} ${timePart}`;
-                } else if (dateStr.length === 19) {
-                    return dateStr;
-                } else if (dateStr.includes('-')) {
-                    return dateStr;
-                } else {
-                    console.warn('未知日期格式:', dateStr);
-                    return dateStr;
-                }
-            } catch (e) {
-                console.error('日期格式化错误:', e, '原始字符串:', dateStr);
-                return dateStr;
-            }
         }
 
         // 生成买卖标记数据
@@ -955,52 +826,33 @@
                 }
             });
 
-            console.log('买入标记数量:', buyMarkers.length);
-            console.log('卖出标记数量:', sellMarkers.length);
-
             return { buyMarkers, sellMarkers };
         }
 
         // ========== K线宽度计算函数 ==========
 
-        // 计算K线像素宽度
         function calculatePixelWidth(visibleCount, chartWidth) {
             const config = KLINE_CONFIG;
-
-            // 屏幕缩放因子
             const scaleFactor = chartWidth / config.BASE_SCREEN_WIDTH;
 
-            // 根据可见K线数量查找对应的宽度配置
             for (const segment of config.WIDTH_SEGMENTS) {
                 if (visibleCount <= segment.maxCount) {
-                    // 基础像素宽度
                     let pixelWidth = segment.width;
-
-                    // 应用屏幕缩放
                     pixelWidth *= scaleFactor;
-
-                    // 应用整体缩放倍数
                     pixelWidth *= config.SCALE_FACTOR_MULTIPLIER;
-
-                    // 边界限制
                     pixelWidth = Math.max(
                         config.MIN_PIXEL_WIDTH,
                         Math.min(config.MAX_PIXEL_WIDTH, pixelWidth)
                     );
-
                     return pixelWidth;
                 }
             }
-
-            // 默认返回最小宽度
             return config.MIN_PIXEL_WIDTH;
         }
 
-        // 计算间距比例
         function calculateGapRatio(visibleCount) {
             const config = KLINE_CONFIG;
 
-            // 根据可见K线数量查找对应的间距配置
             for (const segment of config.GAP_SEGMENTS) {
                 if (visibleCount <= segment.maxCount) {
                     return Math.max(
@@ -1009,103 +861,67 @@
                     );
                 }
             }
-
-            // 默认返回基础间距比例
             return config.GAP_RATIO;
         }
 
-        // 计算标记点大小
         function calculateMarkerSize(klineWidth) {
             const config = KLINE_CONFIG;
-
-            // 根据K线宽度计算标记点大小
             let markerSize = klineWidth * config.MARKER_SIZE_RATIO;
-
-            // 边界限制
             markerSize = Math.max(
                 config.MIN_MARKER_SIZE,
                 Math.min(config.MAX_MARKER_SIZE, markerSize)
             );
-
             return markerSize;
         }
 
-        // 计算并更新K线宽度
         function updateBarWidth() {
             if (!chartInstance) return;
 
             const option = chartInstance.getOption();
             if (!option.dataZoom || option.dataZoom.length < 2) return;
 
-            const dataZoom = option.dataZoom[1]; // 使用slider的dataZoom
+            const dataZoom = option.dataZoom[1];
             const xAxisData = option.xAxis[0].data || [];
             const dataLength = xAxisData.length;
 
             if (dataLength === 0) return;
 
-            // 获取当前显示的K线数量
             const startPercent = dataZoom.start || 0;
             const endPercent = dataZoom.end || 100;
             const visibleCount = Math.round((endPercent - startPercent) / 100 * dataLength);
 
             if (visibleCount <= 0) return;
 
-            // 获取图表容器实际宽度
             const chartWidth = chartInstance.getWidth();
 
             if (!chartWidth || chartWidth <= 0) {
-                console.warn('无法获取图表宽度，延迟重试...');
                 setTimeout(updateBarWidth, 100);
                 return;
             }
 
-            // 1. 计算K线像素宽度
             let pixelWidth = calculatePixelWidth(visibleCount, chartWidth);
-
-            // 2. 计算间距比例
             let gapRatio = calculateGapRatio(visibleCount);
-
-            // 3. 计算间距像素值
             const gapPixels = pixelWidth * gapRatio;
-
-            // 4. 计算每个K线在x轴上的总跨度（K线宽度+间距）
             const totalSpanPerKline = pixelWidth + gapPixels;
-
-            // 5. 计算x轴有效宽度（减去左右边距）
-            const xAxisRange = chartWidth * 0.93; // grid左右边距分别为3%和4%
-
-            // 6. 计算K线数量是否适合当前宽度
+            const xAxisRange = chartWidth * 0.93;
             const requiredWidth = visibleCount * totalSpanPerKline;
 
             if (requiredWidth > xAxisRange) {
-                // 如果总宽度超过有效宽度，按比例缩小
                 const scaleFactor = xAxisRange / requiredWidth;
                 pixelWidth *= scaleFactor;
                 gapRatio *= scaleFactor;
             }
 
-            // 7. 边界检查
             pixelWidth = Math.max(
                 KLINE_CONFIG.MIN_PIXEL_WIDTH,
                 Math.min(KLINE_CONFIG.MAX_PIXEL_WIDTH, pixelWidth)
             );
 
-            // 8. 计算百分比宽度和间距
             const klineSpan = xAxisRange / Math.max(visibleCount, 1);
             const barWidthPercent = (pixelWidth / klineSpan) * 100;
             const gapPercent = (pixelWidth * gapRatio / klineSpan) * 100;
-
-            // 9. 计算标记点大小
             const markerSize = calculateMarkerSize(pixelWidth);
 
-            console.log(
-                `📊 K线配置: 数量=${visibleCount}, ` +
-                `宽度=${pixelWidth.toFixed(1)}px, ` +
-                `间距=${gapRatio.toFixed(1)}倍, ` +
-                `标记点=${markerSize.toFixed(1)}px`
-            );
-
-            // 10. 更新图表选项 - 只更新K线系列
             const currentOption = chartInstance.getOption();
             const newOption = {
                 series: [
@@ -1116,7 +932,6 @@
                         barMinWidth: 1,
                         barMaxWidth: 100
                     },
-                    // 保持收益线不变
                     currentOption.series[1],
                     {
                         type: 'scatter',
@@ -1132,12 +947,11 @@
             chartInstance.setOption(newOption, false, true);
         }
 
-        // 初始化合并图表
+        // ========== 初始化图表 ==========
+
         function initCombinedChart(klineData, returnsData, tradeRecords) {
             const chartDom = document.getElementById('combinedChart');
-            if (!chartDom) {
-                return null;
-            }
+            if (!chartDom) return null;
 
             if (chartInstance) {
                 chartInstance.dispose();
@@ -1216,11 +1030,11 @@
                         type: 'inside',
                         xAxisIndex: 0,
                         filterMode: 'filter',
-                        zoomOnMouseWheel: true,  // 图表区域内滚轮缩放
-                        moveOnMouseWheel: true,  // 图表区域内滚轮平移 - 禁用，用自定义
-                        moveOnMouseMove: true,    // 图表区域内鼠标拖拽平移
-                        zoomLock: true,          // 禁用缩放
-                        zoomSensitivity: 0.5,     // 缩放灵敏度，值越小越慢
+                        zoomOnMouseWheel: true,
+                        moveOnMouseWheel: true,
+                        moveOnMouseMove: true,
+                        zoomLock: true,
+                        zoomSensitivity: 0.5,
                         start: Math.max(0, 100 - Math.min(currentKlineCount, klineData.length) / klineData.length * 100),
                         end: 100,
                         minValueSpan: Math.min(20, klineData.length),
@@ -1232,8 +1046,8 @@
                         show: true,
                         start: Math.max(0, 100 - Math.min(currentKlineCount, klineData.length) / klineData.length * 100),
                         end: 100,
-                        bottom: 15, // 控制点1：滑块距离容器底部的距离（像素值），值越大滑块越靠上
-                        height: 20, // 滑块条的高度
+                        bottom: 15,
+                        height: 20,
                         backgroundColor: 'rgba(150, 150, 150, 0.2)',
                         borderColor: 'rgba(150, 150, 150, 0.3)',
                         fillerColor: 'rgba(150, 150, 150, 1.0)',
@@ -1247,7 +1061,6 @@
                             lineStyle: { opacity: 0 },
                             areaStyle: { opacity: 0 }
                         },
-                        // 禁用ECharts自带的滚轮控制
                         moveOnMouseWheel: false,
                         zoomOnMouseWheel: false,
                         brushSelect: false,
@@ -1257,8 +1070,8 @@
                 grid: {
                     left: '3%',
                     right: '4%',
-                    bottom: '15%', // 控制点2：图表区域（包括K线、坐标轴、日期标签）距离容器底部的距离（百分比），值越大图表越靠上
-                    top: '10%'    // 图表区域距离容器顶部的距离
+                    bottom: '15%',
+                    top: '10%'
                 },
                 xAxis: {
                     type: 'category',
@@ -1275,15 +1088,14 @@
                             }
                             return value;
                         },
-                        margin: 8, // 控制点3：日期标签与x轴线之间的距离
+                        margin: 8,
                     },
-                    offset: 0, // 控制点4：x轴距离图表区域底部的距离（内部偏移），正值向下偏移，负值向上偏移
+                    offset: 0,
                 },
                 yAxis: [
                     {
                         type: 'value',
                         scale: true,
-                        // name: '价格',
                         nameTextStyle: { color: '#aaa' },
                         axisLine: { lineStyle: { color: '#aaa' } },
                         axisLabel: { color: '#aaa', formatter: '{value}' },
@@ -1297,7 +1109,6 @@
                     {
                         type: 'value',
                         scale: true,
-                        // name: '收益(%)',
                         nameTextStyle: { color: '#aaa' },
                         axisLine: { lineStyle: { color: '#aaa' } },
                         axisLabel: { color: '#aaa', formatter: '{value}%' },
@@ -1317,7 +1128,6 @@
                             borderColor0: '#4cd964',
                             borderWidth: 1
                         },
-                        // 初始宽度设为自动，后续会由updateBarWidth更新
                         barWidth: 'auto',
                         barCategoryGap: '30%',
                         yAxisIndex: 0
@@ -1348,7 +1158,7 @@
                         type: 'scatter',
                         data: tradeMarkers.buyMarkers.map(marker => marker.value),
                         symbol: 'circle',
-                        symbolSize: 6, // 初始大小，会被updateBarWidth覆盖
+                        symbolSize: 6,
                         symbolRotate: 0,
                         itemStyle: {
                             color: '#FFAAAA',
@@ -1362,7 +1172,7 @@
                         type: 'scatter',
                         data: tradeMarkers.sellMarkers.map(marker => marker.value),
                         symbol: 'circle',
-                        symbolSize: 6, // 初始大小，会被updateBarWidth覆盖
+                        symbolSize: 6,
                         symbolRotate: 0,
                         itemStyle: {
                             color: '#F0FFF0',
@@ -1376,19 +1186,92 @@
 
             chartInstance.setOption(option);
 
-            // 自定义滚轮控制逻辑
+            // 自定义滚轮控制
+            function setupCustomWheelControl(chartDom) {
+                const slider = chartDom.querySelector('.echarts-slider');
+                if (!slider) {
+                    setTimeout(() => setupCustomWheelControl(chartDom), 100);
+                    return;
+                }
+
+                chartDom.removeEventListener('wheel', chartDom._wheelHandler);
+                slider.addEventListener('wheel', handleCustomWheel, { passive: false });
+                chartDom._customWheelHandler = handleCustomWheel;
+            }
+
+            function handleCustomWheel(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (isSliding) return;
+
+                const currentTime = Date.now();
+                const timeDiff = currentTime - lastWheelTime;
+                if (timeDiff < 50) return;
+
+                lastWheelTime = currentTime;
+
+                const currentOption = chartInstance.getOption();
+                const dataZoom = currentOption.dataZoom[1];
+
+                if (!dataZoom || dataZoom.start === undefined || dataZoom.end === undefined) return;
+
+                let delta = 0;
+                if (e.deltaMode === 0) {
+                    delta = e.deltaY * 0.001;
+                } else if (e.deltaMode === 1) {
+                    delta = e.deltaY * 0.003;
+                } else {
+                    delta = e.deltaY * 0.0010;
+                }
+
+                let newStart = dataZoom.start - delta;
+                let newEnd = dataZoom.end - delta;
+
+                if (newStart < 0) {
+                    newStart = 0;
+                    newEnd = Math.min(100, newEnd - newStart);
+                }
+
+                if (newEnd > 100) {
+                    newEnd = 100;
+                    newStart = Math.max(0, newStart - (newEnd - 100));
+                }
+
+                if (newStart >= newEnd) {
+                    if (delta > 0) {
+                        newStart = newEnd - 1;
+                    } else {
+                        newEnd = newStart + 1;
+                    }
+                }
+
+                newStart = Math.max(0, Math.min(100, newStart));
+                newEnd = Math.max(0, Math.min(100, newEnd));
+
+                isSliding = true;
+
+                chartInstance.dispatchAction({
+                    type: 'dataZoom',
+                    start: newStart,
+                    end: newEnd,
+                    dataZoomIndex: 1
+                });
+
+                setTimeout(() => {
+                    isSliding = false;
+                }, 50);
+            }
+
             setupCustomWheelControl(chartDom);
 
-            // 计算并应用动态宽度
             updateBarWidth();
 
-            // 监听窗口大小变化
             window.addEventListener('resize', function() {
                 chartInstance.resize();
                 updateBarWidth();
             });
 
-            // 监听dataZoom变化
             chartInstance.on('dataZoom', function(params) {
                 updateBarWidth();
             });
@@ -1396,104 +1279,30 @@
             return chartInstance;
         }
 
-        // 设置自定义滚轮控制
-        function setupCustomWheelControl(chartDom) {
-            const slider = chartDom.querySelector('.echarts-slider');
-            if (!slider) {
-                setTimeout(() => setupCustomWheelControl(chartDom), 100);
-                return;
-            }
+        // ========== 表格渲染（保留去重逻辑） ==========
 
-            // 禁用ECharts自带的滚轮事件
-            chartDom.removeEventListener('wheel', chartDom._wheelHandler);
-
-            // 添加自定义滚轮事件监听
-            slider.addEventListener('wheel', handleCustomWheel, { passive: false });
-
-            // 记录滚轮处理器以便后续移除
-            chartDom._customWheelHandler = handleCustomWheel;
-        }
-
-        // 自定义滚轮处理函数
-        function handleCustomWheel(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (isSliding) return;
-
-            const currentTime = Date.now();
-            const timeDiff = currentTime - lastWheelTime;
-
-            // 控制滚轮事件频率
-            if (timeDiff < 50) { // 50毫秒冷却时间，可调整
-                return;
-            }
-
-            lastWheelTime = currentTime;
-
-            // 获取当前dataZoom的start和end
-            const currentOption = chartInstance.getOption();
-            const dataZoom = currentOption.dataZoom[1];
-
-            if (!dataZoom || dataZoom.start === undefined || dataZoom.end === undefined) {
-                return;
-            }
-
-            // 计算滚轮滚动量 - 使用更灵敏的算法
-            let delta = 0;
-            if (e.deltaMode === 0) { // 像素模式
-                delta = e.deltaY * 0.001; // 缩放因子，可调整
-            } else if (e.deltaMode === 1) { // 行模式
-                delta = e.deltaY * 0.003; // 缩放因子，可调整
-            } else { // 页面模式
-                delta = e.deltaY * 0.0010; // 缩放因子，可调整
-            }
-
-            // 计算新的start和end
-            let newStart = dataZoom.start - delta;
-            let newEnd = dataZoom.end - delta;
-
-            // 边界检查 - 防止超出范围
-            if (newStart < 0) {
-                newStart = 0;
-                newEnd = Math.min(100, newEnd - newStart);
-            }
-
-            if (newEnd > 100) {
-                newEnd = 100;
-                newStart = Math.max(0, newStart - (newEnd - 100));
-            }
-
-            // 确保start小于end
-            if (newStart >= newEnd) {
-                if (delta > 0) {
-                    newStart = newEnd - 1;
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                if (dateStr.length === 15) {
+                    const datePart = dateStr.substring(0, 8);
+                    const timePart = dateStr.substring(9);
+                    const year = datePart.substring(0, 4);
+                    const month = datePart.substring(4, 6);
+                    const day = datePart.substring(6, 8);
+                    return `${year}-${month}-${day} ${timePart}`;
+                } else if (dateStr.length === 19) {
+                    return dateStr;
+                } else if (dateStr.includes('-')) {
+                    return dateStr;
                 } else {
-                    newEnd = newStart + 1;
+                    return dateStr;
                 }
+            } catch (e) {
+                return dateStr;
             }
-
-            // 确保范围在0-100之间
-            newStart = Math.max(0, Math.min(100, newStart));
-            newEnd = Math.max(0, Math.min(100, newEnd));
-
-            isSliding = true;
-
-            // 更新dataZoom
-            chartInstance.dispatchAction({
-                type: 'dataZoom',
-                start: newStart,
-                end: newEnd,
-                dataZoomIndex: 1
-            });
-
-            // 重置滑动标志
-            setTimeout(() => {
-                isSliding = false;
-            }, 50);
         }
 
-        // 渲染交易记录表格
         function renderTradeTable(tradeRecords) {
             const tableBody = document.getElementById('tradeData');
             if (!tableBody) return;
@@ -1505,18 +1314,17 @@
                 return;
             }
 
-            // 先按时间从早到晚排序
+            // 按时间从早到晚排序
             const timeSortedTrades = [...tradeRecords].sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
 
-            // 过滤重复项：以操作(operation)和持仓(position)为准
+            // 去重逻辑：仅当 operation 或 position 变化时才显示
             const uniqueRecords = [];
 
             for (let i = 0; i < timeSortedTrades.length; i++) {
                 const currentRecord = timeSortedTrades[i];
 
-                // 如果是第一条记录，总是添加
                 if (i === 0) {
                     uniqueRecords.push(currentRecord);
                     continue;
@@ -1524,14 +1332,13 @@
 
                 const prevRecord = timeSortedTrades[i - 1];
 
-                // 如果操作或仓位有变化，添加到结果中
                 if (currentRecord.operation !== prevRecord.operation ||
                     currentRecord.position !== prevRecord.position) {
                     uniqueRecords.push(currentRecord);
                 }
             }
 
-            // 按日期降序排列用于显示（最新的在最上面）
+            // 按日期降序排列（最新的在最上面）
             const displayRecords = [...uniqueRecords].sort((a, b) => {
                 return new Date(b.date) - new Date(a.date);
             });
@@ -1539,6 +1346,12 @@
             displayRecords.forEach(record => {
                 const row = document.createElement('tr');
                 const operationClass = record.operation === 'BUY' ? 'buy-operation' : 'sell-operation';
+
+                // 处理价格字段：如果是 "-" 或无效数值则显示 "-"
+                let priceDisplay = '-';
+                if (record.price !== undefined && record.price !== '-' && !isNaN(Number(record.price))) {
+                    priceDisplay = Number(record.price).toFixed(2);
+                }
 
                 row.innerHTML = `
                     <td>${formatDate(record.date)}</td>
@@ -1549,117 +1362,71 @@
                     <td><span class="${operationClass}">${record.operation || '-'}</span></td>
                     <td>${record.strategy || '-'}</td>
                     <td>${record.position !== undefined ? record.position : '-'}</td>
-                    <td>${record.price !== undefined ? Number(record.price).toFixed(2) : '-'}</td>
+                    <td>${priceDisplay}</td>
                     <td>${record.equity !== undefined ? Number(record.equity).toFixed(2) : '-'}</td>
                 `;
                 tableBody.appendChild(row);
             });
         }
 
-        // 更新统计数据
-        function updateStats(tradeRecords, equityData, dailyEquityData) {
-            if (!tradeRecords || tradeRecords.length === 0) {
-                ['totalPnl', 'maxDrawdown', 'longestDrawdownDuration', 'totalPositions', 'tradeCount'].forEach(id => {
+        // ========== 更新统计数据（完全依赖后端 stats） ==========
+
+        function updateStats(tradeRecords) {
+            // 检查是否有后端统计数据
+            if (!currentData || !currentData.config || !currentData.config.stats) {
+                ['totalPnl', 'annualizedReturn', 'maxDrawdown', 'longestDrawdownDuration', 'sharpeRatio', 'tradeCount'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.textContent = '-';
                 });
                 return;
             }
 
-            const sortedTrades = [...tradeRecords].sort((a, b) => {
-                return new Date(a.date) - new Date(b.date);
-            });
+            const s = currentData.config.stats;
 
-            const firstRecord = sortedTrades[0];
-            const latestRecord = sortedTrades[sortedTrades.length - 1];
+            // 总收益
+            document.getElementById('totalPnl').textContent = (s.totalReturn !== undefined) ? s.totalReturn + '%' : '-';
 
-            if (firstRecord.equity !== undefined && latestRecord.equity !== undefined) {
-                const pnlEl = document.getElementById('totalPnl');
-                if (pnlEl) {
-                    const initialEquity = Number(firstRecord.equity);
-                    const latestEquity = Number(latestRecord.equity);
-                    if (initialEquity > 0) {
-                        const totalReturn = ((latestEquity - initialEquity) / initialEquity * 100);
-                        pnlEl.textContent = totalReturn.toFixed(2) + '%';
-                    } else {
-                        pnlEl.textContent = '0.00%';
-                    }
-                }
-            }
+            // 平均年化收益
+            document.getElementById('annualizedReturn').textContent = (s.annualizedReturn !== undefined) ? s.annualizedReturn + '%' : '-';
 
-            if (latestRecord.position !== undefined) {
-                const positionsEl = document.getElementById('totalPositions');
-                if (positionsEl) {
-                    positionsEl.textContent = latestRecord.position.toString();
-                }
-            }
+            // 最大回撤
+            document.getElementById('maxDrawdown').textContent = (s.maxDrawdown !== undefined) ? s.maxDrawdown + '%' : '-';
 
-            const tradeCountEl = document.getElementById('tradeCount');
-            if (tradeCountEl) {
-                const uniqueRecords = [];
-                const timeSortedTrades = [...tradeRecords].sort((a, b) => {
-                    return new Date(a.date) - new Date(b.date);
-                });
+            // 最长回撤持续期
+            document.getElementById('longestDrawdownDuration').textContent = (s.longestDrawdownDuration !== undefined) ? s.longestDrawdownDuration + '天' : '-';
 
-                for (let i = 0; i < timeSortedTrades.length; i++) {
-                    const currentRecord = timeSortedTrades[i];
-                    if (i === 0) {
-                        uniqueRecords.push(currentRecord);
-                        continue;
-                    }
-                    const prevRecord = timeSortedTrades[i - 1];
-                    if (currentRecord.operation !== prevRecord.operation ||
-                        currentRecord.position !== prevRecord.position) {
-                        uniqueRecords.push(currentRecord);
-                    }
-                }
-                tradeCountEl.textContent = uniqueRecords.length.toString();
-            }
+            // 夏普
+            document.getElementById('sharpeRatio').textContent = (s.sharpeRatio !== undefined) ? s.sharpeRatio.toFixed(2) : '-';
 
-            if (dailyEquityData && dailyEquityData.length > 0) {
-                const drawdown = calculateMaxDrawdownFromEquity(dailyEquityData);
-                const maxDrawdownEl = document.getElementById('maxDrawdown');
-                const longestDrawdownDurationEl = document.getElementById('longestDrawdownDuration');
-                if (maxDrawdownEl) {
-                    maxDrawdownEl.textContent = `${drawdown.maxDrawdownPercent}%`;
-                }
-                if (longestDrawdownDurationEl) {
-                    longestDrawdownDurationEl.textContent = `${drawdown.longestDrawdownDuration}天`;
-                }
-            }
+            // 交易次数
+            document.getElementById('tradeCount').textContent = (s.tradeCount !== undefined) ? s.tradeCount : '-';
         }
 
-        // 设置K线数量选择器
+        // ========== K线数量选择器 ==========
+
         function setupKlineCountSelector() {
             const klineCountButtons = document.querySelectorAll('.kline-count-btn');
 
             klineCountButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    // 移除所有按钮的active类
                     klineCountButtons.forEach(btn => btn.classList.remove('active'));
-
-                    // 为当前点击的按钮添加active类
                     this.classList.add('active');
 
-                    // 获取K线数量
                     const klineCount = parseInt(this.getAttribute('data-count'));
                     currentKlineCount = klineCount;
 
-                    console.log(`设置K线显示数量: ${klineCount}`);
-
-                    // 如果有数据，重新初始化图表
                     if (currentData && currentData.trades) {
                         const klineData = generateKlineFromTrades(currentData.trades);
                         const equityData = generateEquityData(currentData.trades);
                         const returnsData = generateReturnsFromEquity(equityData);
-
                         initCombinedChart(klineData, returnsData, currentData.trades);
                     }
                 });
             });
         }
 
-        // 刷新数据
+        // ========== 刷新数据 ==========
+
         async function refreshData() {
             try {
                 const dataFile = getDataFileUrl();
@@ -1682,7 +1449,7 @@
 
                 initCombinedChart(klineData, returnsData, data.trades);
                 renderTradeTable(data.trades);
-                updateStats(data.trades, equityData, dailyEquityData);
+                updateStats(data.trades);
 
                 const lastUpdateEl = document.getElementById('lastUpdateTime');
                 if (lastUpdateEl && data.config && data.config.lastUpdated) {
@@ -1709,12 +1476,12 @@
             }
         }
 
-        // 初始化页面
+        // ========== 初始化页面 ==========
+
         async function initPage() {
             try {
                 checkDisclaimer();
                 await refreshData();
-                // 设置K线数量选择器
                 setupKlineCountSelector();
 
                 if (currentData && currentData.config && currentData.config.autoUpdateInterval) {
