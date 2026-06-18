@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>特斯拉(TSLA)模拟交易策略跟踪</title>
+    <title>美股多因子趋势策略（TSLA)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
@@ -424,7 +424,7 @@
 <body>
     <div id="globalWarning">
         <i class="fas fa-exclamation-circle"></i>
-        <strong>模拟交易回测系统 - 不构成投资建议</strong>
+        <strong>模拟交易回测展示 - 不构成投资建议</strong>
         <button onclick="showDisclaimerModal()">查看完整声明</button>
     </div>
 
@@ -435,7 +435,7 @@
 
     <div class="container" id="mainContainer" style="display: none;">
         <header>
-            <h1>特斯拉(TSLA)模拟交易策略跟踪</h1>
+            <h1>美股多因子趋势策略（TSLA)</h1>
             <div class="auto-update-status">
                 <span class="status-indicator"></span>
                 <span>最后更新: <span id="lastUpdateTime" class="timestamp-display">加载中...</span></span>
@@ -449,7 +449,7 @@
             </div>
             <div class="stat-item">
                 <div class="stat-value" id="annualizedReturn">-</div>
-                <div class="stat-label">平均年化收益</div>
+                <div class="stat-label">平均年化</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value" id="maxDrawdown">-</div>
@@ -461,7 +461,7 @@
             </div>
             <div class="stat-item">
                 <div class="stat-value" id="sharpeRatio">-</div>
-                <div class="stat-label">夏普</div>
+                <div class="stat-label">夏普比率</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value" id="tradeCount">-</div>
@@ -515,8 +515,8 @@
         </div>
 
         <div class="disclaimer-footer">
-            <p>特斯拉(TSLA)模拟交易策略跟踪 &copy; 2026</p>
-            <p><strong>风险提示：</strong>所有展示的数据和图表仅为历史回测结果，不涉及真实资金，不构成任何形式的投资建议或承诺。本网页开发者、发布者不对因使用或参考此内容而导致的任何投资损失承担责任。平台数据来源于公开市场信息，不保证准确性、完整性或及时性。投资有风险，请您在做出任何决策前，务必审慎评估自身的风险承受能力。希望这份记录能成为您思考的辅助，而非行动的指令。</p>
+            <p>美股多因子趋势策略 &copy; 2026</p>
+            <p><strong>风险提示：</strong>本页面所展示的数据与图表均基于历史回测及模拟交易结果，不涉及真实资金操作，不构成任何形式的投资建议、收益承诺或保证。相关数据基于历史市场数据及模拟撮合环境生成，可能存在数据延迟、误差或模型假设偏差。金融市场投资存在不确定性，历史表现不代表未来收益，投资者应基于自身风险承受能力独立决策。本策略开发者及发布方不对因使用或参考本内容所产生的任何直接或间接投资损失承担责任。</p>
         </div>
     </div>
 
@@ -525,11 +525,10 @@
             <button class="modal-close" onclick="closeDisclaimerModal()">✕</button>
             <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> 免责声明</h3>
             <div class="modal-body">
-                <p><strong>1. 性质说明</strong> 所有展示的数据和图表仅为历史回测结果，不涉及真实资金，不构成任何形式的投资建议或承诺。</p>
-                <p><strong>2. 数据说明</strong> 平台数据来源于公开市场信息，不保证准确性、完整性或及时性。</p>
-                <p><strong>3. 免责声明</strong> 本网页开发者、发布者不对因使用或参考此内容而导致的任何投资损失承担责任。</p>
-                <p><strong>4. 风险提示</strong> 投资有风险，请您在做出任何决策前，务必审慎评估自身的风险承受能力。</p>
-                <p><strong>5. 正确起点</strong> 希望这份记录能成为您思考的辅助，而非行动的指令。</p>
+                <p><strong>1. 数据性质说明</strong> 本页面所展示的数据与图表均基于历史回测及模拟交易结果，不涉及真实资金操作，不构成任何形式的投资建议、收益承诺或保证。</p>
+                <p><strong>2. 数据来源说明</strong> 相关数据基于历史市场数据及模拟撮合环境生成，可能存在数据延迟、误差或模型假设偏差。</p>
+                <p><strong>3. 风险提示</strong> 金融市场投资存在不确定性，历史表现不代表未来收益，投资者应基于自身风险承受能力独立决策。</p>
+                <p><strong>4. 责任限制</strong> 本策略开发者及发布方不对因使用或参考本内容所产生的任何直接或间接投资损失承担责任。</p>
             </div>
         </div>
     </div>
