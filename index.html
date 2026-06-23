@@ -219,7 +219,7 @@
             border-bottom: none;
         }
 
-        .buy-operation {
+        .buy-signal {
             color: #ff3b30;
             background: rgba(255, 59, 48, 0.1);
             padding: 4px 8px;
@@ -227,7 +227,7 @@
             font-weight: 600;
         }
 
-        .sell-operation {
+        .sell-signal {
             color: #4cd964;
             background: rgba(76, 217, 100, 0.1);
             padding: 4px 8px;
@@ -438,7 +438,7 @@
             <h1>美股多因子趋势策略（TSLA)</h1>
             <div class="auto-update-status">
                 <span class="status-indicator"></span>
-                <span>最后更新: <span id="lastUpdateTime" class="timestamp-display">加载中...</span></span>
+                <span>最后更新 <span id="lastUpdateTime" class="timestamp-display">加载中...</span></span>
             </div>
         </header>
 
@@ -499,7 +499,7 @@
                         <th>最高价</th>
                         <th>最低价</th>
                         <th>收盘价</th>
-                        <th>操作</th>
+                        <th>信号</th>
                         <th>策略</th>
                         <th>持仓</th>
                         <th>价格</th>
@@ -633,7 +633,7 @@
             }
         }
 
-        // ========== 图表数据生成函数（100%保留） ==========
+        // ========== 图表数据生成函数 ==========
 
         // 从trades数据生成K线数据
         function generateKlineFromTrades(trades) {
@@ -800,7 +800,7 @@
                 const lowPrice = Number(trade.low) || closePrice;
                 const highPrice = Number(trade.high) || closePrice;
 
-                if (trade.operation === 'BUY') {
+                if (trade.signal === 'BUY') {
                     const buyPosition = lowPrice - (lowPrice * 0.002);
                     buyMarkers.push({
                         value: [
@@ -811,7 +811,7 @@
                             closePrice.toFixed(2)
                         ]
                     });
-                } else if (trade.operation === 'SELL') {
+                } else if (trade.signal === 'SELL') {
                     const sellPosition = highPrice + (highPrice * 0.002);
                     sellMarkers.push({
                         value: [
@@ -988,32 +988,42 @@
                     textStyle: { color: '#fff' },
                     formatter: function(params) {
                         let result = '';
-                        let operationType = '';
-                        let markerData = null;
+                        let idx = -1;
+                        let returnValue = null;
 
-                        params.forEach(param => {
-                            if (param.seriesType === 'candlestick') {
-                                const dataIndex = param.dataIndex;
-                                result += `<strong>${timeData[dataIndex]}</strong><br/>`;
-                                result += `开盘: ${param.value[1]}<br/>`;
-                                result += `最高: ${param.value[4]}<br/>`;
-                                result += `最低: ${param.value[3]}<br/>`;
-                                result += `收盘: ${param.value[2]}<br/>`;
-                            } else if (param.seriesType === 'line') {
-                                result += `收益: ${param.value.toFixed(2)}%<br/>`;
-                            } else if (param.seriesType === 'scatter') {
-                                if (param.data && param.data.length > 2) {
-                                    markerData = param.data;
-                                }
+                        params.forEach(p => {
+                            if (p.seriesType === 'candlestick') {
+                                idx = p.dataIndex;
+                                result += `<strong>${timeData[idx]}</strong><br/>`;
+                                result += `开盘：${p.value[1]}<br/>`;
+                                result += `最高：${p.value[4]}<br/>`;
+                                result += `最低：${p.value[3]}<br/>`;
+                                result += `收盘：${p.value[2]}<br/>`;
+                            } else if (p.seriesType === 'line') {
+                                returnValue = p.value;
                             }
                         });
 
-                        if (markerData) {
-                            operationType = markerData[2] || markerData[3] || '';
+                        if (returnValue !== null) {
+                            result += `收益：${returnValue.toFixed(2)}%<br/>`;
                         }
 
-                        if (operationType === 'BUY' || operationType === 'SELL') {
-                            result += `操作: ${operationType}<br/>`;
+                        // ----- 分隔线 -----
+                        result += '<hr style="border:none;border-top:1px solid #555;margin:8px 0;width:100%;" />';
+
+                        if (idx >= 0 && currentData && currentData.trades && idx < currentData.trades.length) {
+                            const trade = currentData.trades[idx];
+                            if (trade) {
+                                if (trade.signal !== undefined && trade.signal !== null) {
+                                    result += `信号：${trade.signal}<br/>`;
+                                }
+                                if (trade.position && trade.position.trim()) {
+                                    result += `持仓：${trade.position}<br/>`;
+                                }
+                                if (trade.strategy && trade.strategy.trim()) {
+                                    result += `策略：${trade.strategy}<br/>`;
+                                }
+                            }
                         }
 
                         return result;
@@ -1278,7 +1288,7 @@
             return chartInstance;
         }
 
-        // ========== 表格渲染（保留去重逻辑） ==========
+        // ========== 表格渲染 ==========
 
         function formatDate(dateStr) {
             if (!dateStr) return '';
@@ -1302,73 +1312,143 @@
             }
         }
 
-        function renderTradeTable(tradeRecords) {
+        function renderTradeTable(tradeRecords, page = 1) {
+            const savedScrollY = window.scrollY;
+
             const tableBody = document.getElementById('tradeData');
-            if (!tableBody) return;
+            const container = document.querySelector('.data-table-container');
+            if (!tableBody || !container) return;
+
+            const oldPagination = container.querySelector('.pagination-controls');
+            if (oldPagination) oldPagination.remove();
 
             tableBody.innerHTML = '';
 
             if (!tradeRecords || tradeRecords.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">暂无交易数据</td></tr>';
+                window.scrollTo(0, savedScrollY);
                 return;
             }
 
-            // 按时间从早到晚排序
-            const timeSortedTrades = [...tradeRecords].sort((a, b) => {
-                return new Date(a.date) - new Date(b.date);
-            });
-
-            // 去重逻辑：仅当 operation 或 position 变化时才显示
+            const timeSortedTrades = [...tradeRecords].sort((a, b) => new Date(a.date) - new Date(b.date));
             const uniqueRecords = [];
-
             for (let i = 0; i < timeSortedTrades.length; i++) {
-                const currentRecord = timeSortedTrades[i];
-
+                const current = timeSortedTrades[i];
                 if (i === 0) {
-                    uniqueRecords.push(currentRecord);
+                    uniqueRecords.push(current);
                     continue;
                 }
-
-                const prevRecord = timeSortedTrades[i - 1];
-
-                if (currentRecord.operation !== prevRecord.operation ||
-                    currentRecord.position !== prevRecord.position) {
-                    uniqueRecords.push(currentRecord);
+                const prev = timeSortedTrades[i - 1];
+                if (current.signal !== prev.signal || current.position !== prev.position) {
+                    uniqueRecords.push(current);
                 }
             }
 
-            // 按日期降序排列（最新的在最上面）
-            const displayRecords = [...uniqueRecords].sort((a, b) => {
-                return new Date(b.date) - new Date(a.date);
-            });
+            const displayRecords = uniqueRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            const totalRecords = displayRecords.length;
+            const pageSize = 10;
+            const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
 
-            displayRecords.forEach(record => {
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            const start = (page - 1) * pageSize;
+            const end = Math.min(start + pageSize, totalRecords);
+            const pageData = displayRecords.slice(start, end);
+
+            function formatNum(val) {
+                if (val === undefined || val === null || val === '-') return '-';
+                const num = Number(val);
+                if (isNaN(num)) return val;
+                return num.toFixed(2);
+            }
+
+            pageData.forEach(record => {
                 const row = document.createElement('tr');
-                const operationClass = record.operation === 'BUY' ? 'buy-operation' : 'sell-operation';
-
-                // 处理价格字段：如果是 "-" 或无效数值则显示 "-"
-                let priceDisplay = '-';
-                if (record.price !== undefined && record.price !== '-' && !isNaN(Number(record.price))) {
-                    priceDisplay = Number(record.price).toFixed(2);
-                }
-
+                const operationClass = record.signal === 'BUY' ? 'buy-signal' : 'sell-signal';
                 row.innerHTML = `
                     <td>${formatDate(record.date)}</td>
-                    <td>${record.open !== undefined ? Number(record.open).toFixed(2) : '-'}</td>
-                    <td>${record.high !== undefined ? Number(record.high).toFixed(2) : '-'}</td>
-                    <td>${record.low !== undefined ? Number(record.low).toFixed(2) : '-'}</td>
-                    <td>${record.close !== undefined ? Number(record.close).toFixed(2) : '-'}</td>
-                    <td><span class="${operationClass}">${record.operation || '-'}</span></td>
-                    <td>${record.strategy || '-'}</td>
-                    <td>${record.position !== undefined ? record.position : '-'}</td>
-                    <td>${priceDisplay}</td>
-                    <td>${record.equity !== undefined ? Number(record.equity).toFixed(2) : '-'}</td>
+                    <td>${formatNum(record.open)}</td>
+                    <td>${formatNum(record.high)}</td>
+                    <td>${formatNum(record.low)}</td>
+                    <td>${formatNum(record.close)}</td>
+                    <td><span class="${operationClass}">${record.signal ?? '-'}</span></td>
+                    <td>${record.strategy ?? '-'}</td>
+                    <td>${record.position ?? '-'}</td>
+                    <td>${formatNum(record.price)}</td>
+                    <td>${formatNum(record.equity)}</td>
                 `;
                 tableBody.appendChild(row);
             });
+
+            if (totalPages > 1) {
+                const paginationDiv = document.createElement('div');
+                paginationDiv.className = 'pagination-controls';
+                paginationDiv.style.cssText = `
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+                    margin-top: 20px;
+                    padding: 10px 0;
+                    color: #aaa;
+                `;
+
+                function createPaginationButton(text, disabled, onClick) {
+                    const btn = document.createElement('button');
+                    btn.textContent = text;
+                    btn.className = 'pagination-btn';
+                    btn.disabled = disabled;
+                    btn.style.cssText = `
+                        background: rgba(60,60,60,0.8);
+                        border: 1px solid rgba(255,255,255,0.1);
+                        color: ${disabled ? '#555' : '#aaa'};
+                        padding: 4px 10px;
+                        border-radius: 4px;
+                        cursor: ${disabled ? 'default' : 'pointer'};
+                        font-size: 10px;
+                        transition: all 0.2s ease;
+                        height: 24px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 36px;
+                        line-height: 0;
+                    `;
+                    if (!disabled) {
+                        btn.addEventListener('click', onClick);
+                    }
+                    return btn;
+                }
+
+                const firstBtn = createPaginationButton('◀◀', page === 1, () => renderTradeTable(tradeRecords, 1));
+                const prevBtn  = createPaginationButton('◀',  page === 1, () => renderTradeTable(tradeRecords, page - 1));
+
+                const pageInfo = document.createElement('span');
+                pageInfo.textContent = `${page} / ${totalPages} 页`;
+                pageInfo.style.cssText = `
+                    font-size: 14px;
+                    color: #ccc;
+                    min-width: 80px;
+                    text-align: center;
+                `;
+
+                const nextBtn = createPaginationButton('▶', page === totalPages, () => renderTradeTable(tradeRecords, page + 1));
+                const lastBtn = createPaginationButton('▶▶', page === totalPages, () => renderTradeTable(tradeRecords, totalPages));
+
+                paginationDiv.appendChild(firstBtn);
+                paginationDiv.appendChild(prevBtn);
+                paginationDiv.appendChild(pageInfo);
+                paginationDiv.appendChild(nextBtn);
+                paginationDiv.appendChild(lastBtn);
+
+                container.appendChild(paginationDiv);
+            }
+            window._currentPage = page;
+            window.scrollTo(0, savedScrollY);
         }
 
-        // ========== 更新统计数据（完全依赖后端 stats） ==========
+        // ========== 更新统计数据 ==========
 
         function updateStats(tradeRecords) {
             // 检查是否有后端统计数据
@@ -1441,7 +1521,6 @@
                     dataVersion = data.config.version;
                 }
 
-                // 在生成图表数据之前，同步 active 按钮的 K 线数量
                 const activeBtn = document.querySelector('.kline-count-btn.active');
                 if (activeBtn) {
                     currentKlineCount = parseInt(activeBtn.getAttribute('data-count'));
@@ -1453,7 +1532,7 @@
                 const returnsData = generateReturnsFromEquity(equityData);
 
                 initCombinedChart(klineData, returnsData, data.trades);
-                renderTradeTable(data.trades);
+                renderTradeTable(data.trades, window._currentPage || 1);
                 updateStats(data.trades);
 
                 const lastUpdateEl = document.getElementById('lastUpdateTime');
