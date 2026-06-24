@@ -94,6 +94,37 @@
 
 ---
 
+## 🧩 System Access & Research Collaboration Notes
+
+This project is currently running as a live systematic trading research system with partially observable execution logic.
+
+To preserve execution integrity and reduce reverse-engineering risk, only the following components are publicly exposed:
+
+- Signal timestamps and execution marks
+- OHLC market context at decision points
+- Portfolio equity curve (NAV-based tracking)
+- Trade direction signals (long / short / flat transitions)
+
+The following components are intentionally abstracted:
+
+- Position sizing logic
+- Exact fill prices and order routing logic
+- Strategy parameterization layer
+- Internal risk scaling function
+
+### 🧠 If you are evaluating this system
+
+You may find the following questions useful for assessment:
+
+- How does execution behave under regime shifts?
+- What is the latency sensitivity of signal timing?
+- How does slippage affect short-horizon trend capture?
+- Is performance stable across volatility clusters?
+
+👉 If you are conducting systematic strategy research or execution benchmarking, feel free to open an issue with specific questions.
+
+---
+
 ## ⚠️ 免责声明
 
 1. 本页面所展示数据均基于历史回测及模拟交易结果，不构成任何投资建议或收益承诺
@@ -123,3 +154,8 @@
 ## 📌 项目状态
 
 持续运行中（Live System / Research Environment）
+
+---
+
+## 📬 合作问询 / 技术交流
+请通过 [GitHub Issues](https://github.com/meigudongxie/meigudongxie.github.io/issues) 提交正式问询
