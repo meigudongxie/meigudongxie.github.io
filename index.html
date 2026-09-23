@@ -456,7 +456,7 @@
                 <div class="stat-label">最大回撤</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="longestDrawdownDuration">-</div>
+                <div class="stat-value" id="lddDuration">-</div>
                 <div class="stat-label">最长回撤持续期</div>
             </div>
             <div class="stat-item">
@@ -1453,7 +1453,7 @@
         function updateStats(tradeRecords) {
             // 检查是否有后端统计数据
             if (!currentData || !currentData.config || !currentData.config.stats) {
-                ['totalPnl', 'annualizedReturn', 'maxDrawdown', 'longestDrawdownDuration', 'sharpeRatio', 'tradeCount'].forEach(id => {
+                ['totalPnl', 'annualizedReturn', 'maxDrawdown', 'lddDuration', 'sharpeRatio', 'tradeCount'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.textContent = '-';
                 });
@@ -1472,7 +1472,7 @@
             document.getElementById('maxDrawdown').textContent = (s.maxDrawdown !== undefined) ? s.maxDrawdown + '%' : '-';
 
             // 最长回撤持续期
-            document.getElementById('longestDrawdownDuration').textContent = (s.longestDrawdownDuration !== undefined) ? s.longestDrawdownDuration + '天' : '-';
+            document.getElementById('lddDuration').textContent = (s.lddDuration !== undefined) ? s.lddDuration + '天' : '-';
 
             // 夏普
             document.getElementById('sharpeRatio').textContent = (s.sharpeRatio !== undefined) ? s.sharpeRatio.toFixed(2) : '-';
